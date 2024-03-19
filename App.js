@@ -5,10 +5,13 @@ import NavBar from './components/NavBar';
 
 export default function App() {
   return (
-    <View >
       <NavBar />
-    </View>
   );
 }
 
-
+styles = StyleSheet.create({
+  NavBar: {
+      backgroundColor: 'lightgrey',
+      color: 'black',
+  }
+})
