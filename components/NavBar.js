@@ -44,7 +44,7 @@ export default function NavBar() {
                     labelStyle: {
                         fontSize: 15,
                         fontWeight: 'bold',
-                        marginBottom: -2
+                        marginBottom: -2,
                     },
                     
                 }}>
