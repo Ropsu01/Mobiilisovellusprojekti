@@ -4,7 +4,7 @@ import React from 'react'
 export default function Calendar() {
   return (
     <View>
-      <Text>Calendar</Text>
+      <Text>Kalenteri</Text>
     </View>
   )
 }
