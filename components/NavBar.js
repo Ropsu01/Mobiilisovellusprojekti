@@ -8,8 +8,8 @@ import Weather from '../screens/Weather';
 import Jokes from '../screens/Jokes';
 import { NavigationContainer } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faSun, faLaughBeam } from '@fortawesome/free-regular-svg-icons';
-import { faHouse, faTasks, faCalendarDays} from '@fortawesome/free-solid-svg-icons';
+import {faLaughBeam} from '@fortawesome/free-regular-svg-icons';
+import { faHouse, faTasks, faCalendarDays, faCloudSun} from '@fortawesome/free-solid-svg-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -28,7 +28,7 @@ export default function NavBar() {
                         } else if (route.name === 'Kalenteri') {
                             iconName = faCalendarDays;
                         } else if (route.name === 'Säätiedot') {
-                            iconName = faSun;
+                            iconName = faCloudSun;
                         } else if (route.name === 'Viihde') {
                             iconName = faLaughBeam;
                         }
@@ -42,17 +42,17 @@ export default function NavBar() {
                     inactiveBackgroundColor: '#ABD7AA',
                     activeBackgroundColor: '#ABD7AA',
                     labelStyle: {
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        marginBottom: -2,
+                        display: 'none', // Piilottaa alavalikon napin tekstin
                     },
                     
                 }}>
+            
                 <Tab.Screen name="Koti" component={Home} />
                 <Tab.Screen name="Tehtävät" component={Tasks} />
                 <Tab.Screen name="Kalenteri" component={Calendar} />
                 <Tab.Screen name="Säätiedot" component={Weather} />
                 <Tab.Screen name="Viihde" component={Jokes} />
+            
             </Tab.Navigator>
         </NavigationContainer>
     );
