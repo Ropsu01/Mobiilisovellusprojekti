@@ -15,7 +15,15 @@ const JokesAndFacts = () => {
     "Mitä laivan työntekijä pukee päälleen mennessään töihin? - Alusvaatteet.",
     "Kuka vetää lintujen AA-kerhoa? - Selvä pyy.",
     "Mistä kankaasta kummitusten vaatteet on tehty? - Buuvillasta.",
-    
+    "Mikä Postimies Patesta tuli, kun hän jäi eläkeelle? - Pate",
+    "Mikä on pilates suomeksi? - Melilosvot",
+    "Mitä Puolalainen teki altaassa? - Polski",
+    "Mikä on maailman yksinkertaisin peli? - Simppeli",
+    "Miksi Aki syö pullaa sateella? - Ei vaivannut keliakia",
+    "Mikä tuli USA:n jälkeen? - USB",
+    "Mitä Espanjalainen sanoi nähdessään hyvän diaesityksen? - Buenos Dias",
+    "Mitä eroa on mustilla ja vihreillä oliiveilla? - Musti on koira",
+
     // Add more jokes here
   ];
 
@@ -32,6 +40,23 @@ const JokesAndFacts = () => {
     "Kuun painovoima on noin 1/6 maan painovoimasta.",
     "Siilillä on noin 7000 piikkiä kehossaan.",
     "Krokotiilit voivat elää jopa 100 vuotta.",
+    "Muurahaiset nukkuvat 8 minuuttia päivässä, mikä tekee niistä eläinmaailman lyhimmän unen nukkujat.",
+    "Eiffel-torni voi olla jopa 15 senttiä korkeampi kesällä lämpölaajenemisen vuoksi.",
+    "Skotlannin kansalliseläin on yksisarvinen",
+    "Mustekalalla on kolme sydäntä.",
+    "Sitruuna kelluu, mutta lime ei.",
+    "Eläimet voivat olla allergisia ihmisille.",
+    "Australia on leveämpi kuin Kuu.",
+    "Paavi ei voi toimia elinluovuttajana.",
+    "Lepakot ovat ainoita lentäviä nisäkkäitä",
+    "Ihmiskehon pienin luu sijaitsee korvassa.",
+    "Maailman vanhin kirjoitettu resepti on yli 4000 vuotta vanha.",
+    "Maailmassa on vain yksi maa, jossa ei ole hyttysiä - Islanti.",
+    "Suomessa on enemmän saunoja kuin autoja.",
+    "Kynnet kasvavat nopeammin kesällä kuin talvella.",
+
+
+    
     // Add more facts here
   ];
 
@@ -50,11 +75,11 @@ const JokesAndFacts = () => {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <View style={{ backgroundColor: '#E7FDDF', padding: 20, marginBottom: 20 }}>
+      <View style={{ backgroundColor: '#E7FDDF', width: 350, height: 120, padding: 20, marginBottom: 20 }}>
         <Text style={{ fontSize: 18 }}>Päivän Vitsi:</Text>
         <Text style={{ marginTop: 10 }}>{joke}</Text>
       </View>
-      <View style={{ backgroundColor: '#E7FDDF', padding: 20, marginBottom: 20 }}>
+      <View style={{ backgroundColor: '#E7FDDF', width: 350, height: 120, padding: 20, marginBottom: 20 }}>
         <Text style={{ fontSize: 18 }}>Hauska Fakta:</Text>
         <Text style={{ marginTop: 10 }}>{funFact}</Text>
       </View>
