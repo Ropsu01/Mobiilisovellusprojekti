@@ -10,8 +10,10 @@ export default function App() {
 }
 
 styles = StyleSheet.create({
-  NavBar: {
+  container: {
       backgroundColor: 'lightgrey',
       color: 'black',
+      alignItems: 'center',
+      justifyContent: 'center',
   }
 })
