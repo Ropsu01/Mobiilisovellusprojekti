@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text } from 'react-native';
 
 const JokesAndFacts = () => {
   const [joke, setJoke] = useState('');
   const [funFact, setFunFact] = useState('');
+  const [lastUpdatedDay, setLastUpdatedDay] = useState(0);
 
   const jokes = [
     "Mitä astronautti tokaisi löydettyään luurangon kuusta? - Mitä kuuluu?",
@@ -53,24 +54,31 @@ const JokesAndFacts = () => {
     "Maailman vanhin kirjoitettu resepti on yli 4000 vuotta vanha.",
     "Maailmassa on vain yksi maa, jossa ei ole hyttysiä - Islanti.",
     "Suomessa on enemmän saunoja kuin autoja.",
-    "Kynnet kasvavat nopeammin kesällä kuin talvella.",
-
-
-    
+    "Kynnet kasvavat nopeammin kesällä kuin talvella."
     // Add more facts here
   ];
 
-  // Function to pick random joke and fact
-  const updateContent = () => {
-    const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
-    const randomFact = facts[Math.floor(Math.random() * facts.length)];
-    setJoke(randomJoke);
-    setFunFact(randomFact);
+  // Function to pick a random joke or fact
+  const getRandomContent = (contentArray) => {
+    const randomIndex = Math.floor(Math.random() * contentArray.length);
+    return contentArray[randomIndex];
+  };
+
+  // Function to update joke and fact daily
+  const updateDailyContent = () => {
+    const today = new Date().getDate();
+    if (today !== lastUpdatedDay) {
+      const newJoke = getRandomContent(jokes);
+      const newFact = getRandomContent(facts);
+      setJoke(newJoke);
+      setFunFact(newFact);
+      setLastUpdatedDay(today);
+    }
   };
 
   // Call the update function initially when the component mounts
-  React.useEffect(() => {
-    updateContent();
+  useEffect(() => {
+    updateDailyContent();
   }, []);
 
   return (
@@ -83,7 +91,6 @@ const JokesAndFacts = () => {
         <Text style={{ fontSize: 18 }}>Hauska Fakta:</Text>
         <Text style={{ marginTop: 10 }}>{funFact}</Text>
       </View>
-      <Button title="Päivitä" onPress={updateContent} />
     </View>
   );
 };
