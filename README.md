@@ -1,5 +1,11 @@
 # Mobiilisovellusprojekti
 
+Mobiilisovellus
+:D
+xD
+
+
+
 
 ### Muistilista asennuksille
 
