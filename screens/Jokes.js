@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const JokesAndFacts = () => {
   const [joke, setJoke] = useState('');
@@ -35,7 +35,6 @@ const JokesAndFacts = () => {
     "Krokotiilit itse asiassa itkevät kun he syövät.",
     "Karhut ovat oikeakätisiä.",
     "Koira on ainoa eläin, joka osaa lukea ihmisen kasvoja.",
-    "Kilpikonnat voivat hengittää peräaukostaan.",
     "Auringonpimennys tapahtuu noin joka 18 kuukauden välein ja kestää vain muutaman minuutin.",
     "Maapallon kiertorata on noin 940 miljoonaa kilometriä.",
     "Kuun painovoima on noin 1/6 maan painovoimasta.",
@@ -54,17 +53,19 @@ const JokesAndFacts = () => {
     "Maailman vanhin kirjoitettu resepti on yli 4000 vuotta vanha.",
     "Maailmassa on vain yksi maa, jossa ei ole hyttysiä - Islanti.",
     "Suomessa on enemmän saunoja kuin autoja.",
-    "Kynnet kasvavat nopeammin kesällä kuin talvella."
+    "Kynnet kasvavat nopeammin kesällä kuin talvella.",
+    "Venäjällä on 11 eri aikavyöhykettä.",
+
     // Add more facts here
   ];
 
-  // Function to pick a random joke or fact
+  // Funktio valitsee satunnaisen vitsin tai faktan
   const getRandomContent = (contentArray) => {
     const randomIndex = Math.floor(Math.random() * contentArray.length);
     return contentArray[randomIndex];
   };
 
-  // Function to update joke and fact daily
+  // Funktio päivittää vitsin ja faktan päivittäin
   const updateDailyContent = () => {
     const today = new Date().getDate();
     if (today !== lastUpdatedDay) {
@@ -76,23 +77,48 @@ const JokesAndFacts = () => {
     }
   };
 
-  // Call the update function initially when the component mounts
+  // Kutsutaan päivitysfunktiota komponentin ensimmäisellä renderöinnillä
   useEffect(() => {
     updateDailyContent();
   }, []);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <View style={{ backgroundColor: '#E7FDDF', width: 350, height: 120, padding: 20, marginBottom: 20 }}>
-        <Text style={{ fontSize: 18 }}>Päivän Vitsi:</Text>
-        <Text style={{ marginTop: 10 }}>{joke}</Text>
-      </View>
-      <View style={{ backgroundColor: '#E7FDDF', width: 350, height: 120, padding: 20, marginBottom: 20 }}>
-        <Text style={{ fontSize: 18 }}>Hauska Fakta:</Text>
-        <Text style={{ marginTop: 10 }}>{funFact}</Text>
-      </View>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={updateDailyContent} style={styles.card}>
+        <Text style={styles.title}>Päivän Vitsi:</Text>
+        <Text style={styles.content}>{joke}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={updateDailyContent} style={styles.card}>
+        <Text style={styles.title}>Hauska Fakta:</Text>
+        <Text style={styles.content}>{funFact}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  card: {
+    backgroundColor: '#ABD7AA',
+    width: '100%',
+    padding: 20,
+    marginBottom: 20,
+    borderRadius: 20,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  content: {
+    fontSize: 16,
+  },
+});
 
 export default JokesAndFacts;
