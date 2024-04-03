@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import firebase from 'firebase/app';
-import 'firebase/database';
+import '../firebase/Config';
+import { AppRegistry } from 'react-native';
+import App from '../App';
+AppRegistry.registerComponent('MyApp', () => App);
 
 // Alusta Firebase-app
 const firebaseConfig = {
