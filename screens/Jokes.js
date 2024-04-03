@@ -1,22 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import firebase from 'firebase/app';
-import '../firebase/Config';
-import { AppRegistry } from 'react-native';
-import App from '../App';
-AppRegistry.registerComponent('MyApp', () => App);
-
-// Alusta Firebase-app
-const firebaseConfig = {
-  // Lisää Firebase-projektisi konfiguraatio tähän
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.database();
+import { collection, addDoc, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { firestore } from '../firebase/Config';
 
 const JokesAndFacts = () => {
   const [joke, setJoke] = useState('');
@@ -24,84 +10,107 @@ const JokesAndFacts = () => {
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
 
-  // Haetaan vitsit ja faktat Firebasesta
   useEffect(() => {
-    const fetchData = () => {
-      const jokesRef = db.ref('jokes');
-      const factsRef = db.ref('facts');
-
-      jokesRef.once('value', snapshot => {
-        const jokesData = snapshot.val();
-        const randomJokeIndex = Math.floor(Math.random() * jokesData.length);
-        setJoke(jokesData[randomJokeIndex]);
-      });
-
-      factsRef.once('value', snapshot => {
-        const factsData = snapshot.val();
-        const randomFactIndex = Math.floor(Math.random() * factsData.length);
-        setFunFact(factsData[randomFactIndex]);
-      });
+    const fetchData = async () => {
+      const jokesSnapshot = await getDocs(collection(firestore, 'jokes'));
+      const jokesData = jokesSnapshot.docs.map(doc => doc.data());
+      const randomJokeIndex = Math.floor(Math.random() * jokesData.length);
+      setJoke(jokesData[randomJokeIndex]);
+      console.log("Fetched jokes", jokesData); // Debugging line
+      const factsSnapshot = await getDocs(collection(firestore, 'facts'));
+      const factsData = factsSnapshot.docs.map(doc => doc.data());
+      const randomFactIndex = Math.floor(Math.random() * factsData.length);
+      setFunFact(factsData[randomFactIndex]);
+      console.log("Fetched facts", factsData); // Debugging line
     };
 
     fetchData();
   }, []);
 
-  // Tallenna suosikkilista Firebaseen
-  const saveFavoritesToFirebase = () => {
-    db.ref('favorites').set(favorites);
-  };
-
-  // Lataa suosikkilista Firebasesta
   useEffect(() => {
-    const fetchFavorites = () => {
-      db.ref('favorites').once('value', snapshot => {
-        const favoritesData = snapshot.val() || [];
-        setFavorites(favoritesData);
-      });
+    const fetchFavorites = async () => {
+      const favoritesSnapshot = await getDocs(collection(firestore, 'favorites'));
+      const favoritesData = favoritesSnapshot.docs.map(doc => doc.data().favorites);
+      setFavorites(favoritesData[0] || []);
     };
 
     fetchFavorites();
   }, []);
 
-  // Lisää tai poista suosikkilistalta
-  const toggleFavorite = (content) => {
+  const toggleFavorite = async (content) => {
     if (favorites.includes(content)) {
       const updatedFavorites = favorites.filter((item) => item !== content);
       setFavorites(updatedFavorites);
+      await deleteFavoriteFromFirestore(content);
     } else {
-      setFavorites([...favorites, content]);
+      const updatedFavorites = [...favorites, content];
+      setFavorites(updatedFavorites);
+      await addFavoriteToFirestore(content);
+    }
+  };
+
+  const addFavoriteToFirestore = async (content) => {
+    try {
+      const favoritesCollection = collection(firestore, 'favorites');
+      await setDoc(doc(favoritesCollection, 'userFavorites'), { favorites: [...favorites, content] });
+      console.log('Favorite added to Firestore');
+    } catch (error) {
+      console.error('Error adding favorite to Firestore: ', error);
+    }
+  };
+
+  const deleteFavoriteFromFirestore = async (content) => {
+    try {
+      const favoritesCollection = collection(firestore, 'favorites');
+      await deleteDoc(doc(favoritesCollection, 'userFavorites'));
+      console.log('Favorite deleted from Firestore');
+    } catch (error) {
+      console.error('Error deleting favorite from Firestore: ', error);
     }
   };
 
   return (
     <View style={styles.container}>
       {/* Päivän vitsi */}
-      <TouchableOpacity onPress={() => {}} style={styles.card}>
+      <View style={styles.card}>
         <Text style={styles.title}>Päivän Vitsi:</Text>
-        <Text style={styles.content}>{joke}</Text>
-      </TouchableOpacity>
+        <Text style={styles.content}>{joke.joke}</Text>
+        <MaterialIcons
+          name={favorites.includes(joke.joke) ? "star" : "star-border"}
+          size={24}
+          color={favorites.includes(joke.joke) ? "gold" : "gold"}
+          onPress={() => toggleFavorite(joke.joke)}
+        />
+      </View>
 
       {/* Päivän fakta */}
-      <TouchableOpacity onPress={() => {}} style={styles.card}>
+      <View style={styles.card}>
         <Text style={styles.title}>Hauska Fakta:</Text>
-        <Text style={styles.content}>{funFact}</Text>
-      </TouchableOpacity>
+        <Text style={styles.content}>{funFact.fact}</Text>
+        <MaterialIcons
+          name={favorites.includes(funFact.fact) ? "star" : "star-border"}
+          size={24}
+          color={favorites.includes(funFact.fact) ? "gold" : "gold"}
+          onPress={() => toggleFavorite(funFact.fact)}
+        />
+      </View>
 
-      {/* Suosikkilista */}
-      <ScrollView style={styles.favoriteList}>
+      {/* Suosikit */}
+      <TouchableOpacity onPress={() => setShowFavorites(!showFavorites)} style={styles.favoriteList}>
         <Text style={styles.favoriteTitle}>Suosikit:</Text>
-        {favorites.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.favoriteItemContainer} onPress={() => toggleFavorite(item)}>
-            <Text style={styles.favoriteItem}>{item}</Text>
-            <MaterialIcons name="clear" size={24} color="red" />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Tallenna suosikkilista */}
-      <TouchableOpacity onPress={saveFavoritesToFirebase} style={styles.saveFavoritesButton}>
-        <Text style={styles.saveFavoritesButtonText}>Tallenna suosikit</Text>
+        <MaterialIcons name={showFavorites ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={24} color="black" />
       </TouchableOpacity>
+
+      {showFavorites && (
+        <ScrollView style={styles.favoriteList}>
+          {favorites.map((item, index) => (
+            <View key={index} style={styles.favoriteItemContainer}>
+              <Text style={styles.favoriteItem}>{item}</Text>
+              <MaterialIcons name="clear" size={24} color="red" onPress={() => toggleFavorite(item)} />
+            </View>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -150,17 +159,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     marginRight: 10,
-  },
-  saveFavoritesButton: {
-    backgroundColor: 'lightblue',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  saveFavoritesButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 

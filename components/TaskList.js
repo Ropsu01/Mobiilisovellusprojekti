@@ -1,4 +1,3 @@
-
 import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore'
@@ -13,13 +12,12 @@ import { NestableScrollContainer, NestableDraggableFlatList } from "react-native
 
 
 
-
-
 export default function TaskList() {
     const [todos, setTodos] = useState([])  // Muuta tämä
     const [todo, setTodo] = useState('')
-    const [draggingTaskId, setDraggingTaskId] = useState(null);
-    const [isDragging, setIsDragging] = useState(false);
+    const todosRef = useRef([]);
+    //const [draggingTaskId, setDraggingTaskId] = useState(null);
+    //const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         const q = query(collection(firestore, 'todos'))
@@ -53,21 +51,12 @@ export default function TaskList() {
 
     const renderTodo = ({ item, index, drag }) => {
         const ref = doc(firestore, `todos/${item.id}`)
-        const [isEditing, setIsEditing] = useState(false);
-        const [editedText, setEditedText] = useState(item.text);
 
         const toggleDone = async () => {
             updateDoc(ref, { done: !item.done })
         }
         const deleteItem = async () => {
             deleteDoc(ref)
-        }
-
-        const saveEditedText = async () => {
-            if (editedText.trim() !== "") {
-                await updateDoc(ref, { text: editedText });
-                setIsEditing(false);
-            }
         }
 
         return (
@@ -82,12 +71,11 @@ export default function TaskList() {
             //         style={styles.todo}
             // >
             <View style={[styles.todoContainer]}>
-                
                 <TouchableOpacity
                     onLongPress={drag}
                     onPress={toggleDone}
                     style={styles.todo}
-                    
+                    //delayLongPress={0}
                 >
                     {item.done && <IconIonicons name='checkbox' size={30} color={'#1a8f3f'} />}
                     {!item.done && <IconIonicons name='square-outline' size={30} color={'#79747E'} />}
@@ -98,6 +86,17 @@ export default function TaskList() {
         )
     }
 
+    const onDragEnd = async ({ data }) => {
+        const batch = [];
+        data.forEach((item, index) => {
+            const ref = doc(firestore, `todos/${item.id}`);
+            batch.push(updateDoc(ref, { order: index }));
+        });
+        await Promise.all(batch);
+    
+        // Päivitä tila vasta kun järjestys on tallennettu tietokantaan
+        setTodos(data);
+    }
 
     return (
         <GestureHandlerRootView style={styles.container}>
@@ -117,7 +116,7 @@ export default function TaskList() {
                             setIsDragging(true);
                         }}
                         onDragEnd={({ data }) => {
-                            setTodos(data);
+                            setTodos(todosRef.current);
                             setIsDragging(false);
                         }}
                     />
