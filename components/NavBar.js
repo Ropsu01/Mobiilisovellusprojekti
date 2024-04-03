@@ -51,7 +51,7 @@ export default function NavBar() {
                     inactiveBackgroundColor: '#ABD7AA',
                     activeBackgroundColor: '#ABD7AA',
                     labelStyle: {
-                        display: 'none', // Piilottaa alavalikon napin tekstin
+                    display: 'none', 
                     },
 
                 }}>
