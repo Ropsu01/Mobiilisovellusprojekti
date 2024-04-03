@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, ScrollView, FlatList, StyleSheet} from 'react-native';
 
 const api = {
     url: process.env.EXPO_PUBLIC_API_URL,
@@ -106,28 +106,35 @@ const renderDailyHeader = () => (
     );
 }
 
+
 const styles = StyleSheet.create({
     container: {
-        width: 330,
-        backgroundColor: 'ABDCAA',
-        color: 'ABDCAA',
+        width: 360,
     },
     currentWeather: {
         alignItems: 'center', // Center items horizontally
         paddingBottom: 10, // Add padding at the bottom of the current weather container
-        borderBottomWidth: 1, // Add a border at the bottom of the current weather container
+        backgroundColor: '#ABDCAA',
+        borderRadius: 10,
+        marginBottom: 10, 
     },
     hourlyForecastContainer: {
-        minHeight: 150, // Set minimum height to ensure scrollability
+        height: 150, // Set minimum height to ensure scrollability
+        backgroundColor: '#ABDCAA',
+        borderRadius: 10,
+        minWidth: 360,
+        marginBottom: 10,
     },
     dailyForecastContainer: {
         maxHeight: 300, // Limit the height of the daily forecast container
+        backgroundColor: '#ABDCAA',
+        borderRadius: 10,
     },
     hourlyForecastItem: {
         alignItems: 'center', // Center items horizontally
-        paddingVertical: 10, // Vertical padding to separate items
-        paddingHorizontal: 5, // Horizontal padding to separate items
-        borderBottomWidth: 1, // Add a border at the bottom of each hourly forecast item
+        borderRadius: 10,
+        paddingVertical: 10, // Add padding to separate items
+        paddingHorizontal: 5, // Add padding to separate items
     },
     dailyForecastItem: {
         alignItems: 'center', // Center items horizontally

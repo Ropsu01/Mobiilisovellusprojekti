@@ -1,8 +1,10 @@
-import { View, Text, Button } from 'react-native'
-import React, { useEffect } from 'react'
+import { View, Text, Button, StyleSheet, TextInput } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { collection, addDoc } from 'firebase/firestore'
 import { firestore } from '../firebase/Config'
-
+import { AppRegistry } from 'react-native';
+import App from '../App';
+AppRegistry.registerComponent('MyApp', () => App);
 
 
 export default function TaskList() {
