@@ -50,12 +50,21 @@ export default function TaskList() {
 
     const renderTodo = ({ item, index, drag }) => {
         const ref = doc(firestore, `todos/${item.id}`)
+        const [isEditing, setIsEditing] = useState(false);
+        const [editedText, setEditedText] = useState(item.text);
 
         const toggleDone = async () => {
             updateDoc(ref, { done: !item.done })
         }
         const deleteItem = async () => {
             deleteDoc(ref)
+        }
+
+        const saveEditedText = async () => {
+            if (editedText.trim() !== "") {
+                await updateDoc(ref, { text: editedText });
+                setIsEditing(false);
+            }
         }
 
         return (
@@ -70,6 +79,7 @@ export default function TaskList() {
             //         style={styles.todo}
             // >
             <View style={[styles.todoContainer]}>
+                
                 <TouchableOpacity
                     onLongPress={drag}
                     onPress={toggleDone}
