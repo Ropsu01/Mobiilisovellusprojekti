@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, ScrollView, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore } from '../firebase/Config'
@@ -9,14 +9,15 @@ import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicon
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NestableScrollContainer, NestableDraggableFlatList } from "react-native-draggable-flatlist"
-
+import { Alert } from 'react-native';
 
 
 export default function TaskList() {
     const [todos, setTodos] = useState([])  // Muuta tämä
     const [todo, setTodo] = useState('')
-    const [draggingTaskId, setDraggingTaskId] = useState(null);
-    const [isDragging, setIsDragging] = useState(false);
+    const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+
 
     useEffect(() => {
         const q = query(collection(firestore, 'todos'))
@@ -47,25 +48,49 @@ export default function TaskList() {
         setTodo('')
     }
 
+    const editTodo = async (id) => {
+        const ref = doc(firestore, `todos/${editedTodo.id}`);
+        await updateDoc(ref, { text: editedTodo.text });
+        setIsEditModalVisible(false);  
+    }
 
-    const renderTodo = ({ item, index, drag }) => {
+
+
+    const openEditModal = (id, text) => {
+        setEditedTodo({ id, text });
+        setIsEditModalVisible(true);
+    }
+
+    const closeEditModal = () => {
+        setIsEditModalVisible(false);
+    }
+
+
+    const renderTodo = ({ item, index }) => {
         const ref = doc(firestore, `todos/${item.id}`)
-        const [isEditing, setIsEditing] = useState(false);
-        const [editedText, setEditedText] = useState(item.text);
 
         const toggleDone = async () => {
             updateDoc(ref, { done: !item.done })
         }
         const deleteItem = async () => {
-            deleteDoc(ref)
-        }
-
-        const saveEditedText = async () => {
-            if (editedText.trim() !== "") {
-                await updateDoc(ref, { text: editedText });
-                setIsEditing(false);
-            }
-        }
+            Alert.alert(
+        'Poista tehtävä',
+        'Haluatko varmasti poistaa tämän tehtävän?',
+        [
+            {
+                text: 'Peruuta',
+                style: 'cancel',
+            },
+            {
+                text: 'Poista',
+                onPress: async () => {
+                    await deleteDoc(ref);
+                },
+            },
+        ],
+        { cancelable: false }
+    );
+}
 
         return (
             // <View style={styles.todoContainer}>
@@ -79,18 +104,20 @@ export default function TaskList() {
             //         style={styles.todo}
             // >
             <View style={[styles.todoContainer]}>
-                
                 <TouchableOpacity
-                    onLongPress={drag}
                     onPress={toggleDone}
                     style={styles.todo}
-                    
                 >
                     {item.done && <IconIonicons name='checkbox' size={30} color={'#1a8f3f'} />}
                     {!item.done && <IconIonicons name='square-outline' size={30} color={'#79747E'} />}
                     <Text style={styles.todoText}>{item.text}</Text>
                 </TouchableOpacity>
-                <IconIonicons name='trash-outline' size={21} color='#79747E' onPress={deleteItem} />
+                <TouchableOpacity style={{marginRight: 15}} onPress={() => openEditModal(item.id, item.text)}>
+                    <IconIonicons name='create-outline' size={25} color='#79747E' />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={deleteItem}>
+                    <IconIonicons name='trash-outline' size={25} color='#79747E' />
+                </TouchableOpacity>
             </View>
         )
     }
@@ -104,22 +131,32 @@ export default function TaskList() {
             </View>
 
             {todos.length > 0 && (
-                <ScrollView style={styles.scrollContainer}>
-                    <DraggableFlatList
-                        data={todos}
-                        renderItem={renderTodo}
-                        keyExtractor={(item) => item.id}
-                        onDragBegin={(index) => {
-                            setDraggingTaskId(todos[index].id);
-                            setIsDragging(true);
-                        }}
-                        onDragEnd={({ data }) => {
-                            setTodos(data);
-                            setIsDragging(false);
-                        }}
-                    />
-                </ScrollView>
+                <FlatList
+                    style={[styles.scrollContainer, { maxHeight: todos.length > 9 ? 570 : null }]}
+                    data={todos}
+                    renderItem={renderTodo}
+                    keyExtractor={(item) => item.id}
+                    scrollEnabled={todos.length > 9}
+                />
             )}
+            <Modal
+                visible={isEditModalVisible}
+                animationType='fade'
+                transparent={true}
+                onRequestClose={closeEditModal}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <TextInput
+                            style={styles.editTextInput}
+                            onChangeText={(text) => setEditedTodo({ ...editedTodo, text })}
+                            value={editedTodo.text}
+                        />
+                        <Button onPress={editTodo} title="Tallenna" />
+                        <Button onPress={closeEditModal} title="Peruuta" />
+                    </View>
+                </View>
+            </Modal>
         </GestureHandlerRootView>
     )
 }
@@ -179,5 +216,26 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         maxHeight: 570,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: '#ffffff',
+        width: '80%',
+        padding: 20,
+        borderRadius: 10,
+        elevation: 5,
+    },
+    editTextInput: {
+        height: 40,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: '#cccccc',
+        borderRadius: 5,
+        paddingHorizontal: 10,
     },
 })
