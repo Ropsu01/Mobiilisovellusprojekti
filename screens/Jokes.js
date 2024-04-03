@@ -25,6 +25,11 @@ const JokesAndFacts = () => {
     };
 
     fetchData();
+
+    // Fetch new jokes and facts every 24 hours
+    const intervalId = setInterval(fetchData, 24 * 60 * 60 * 1000);
+
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);
 
   useEffect(() => {
