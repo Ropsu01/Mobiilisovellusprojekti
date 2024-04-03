@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { AppRegistry } from 'react-native';
+import App from '../App';
+AppRegistry.registerComponent('MyApp', () => App);
 
 const JokesAndFacts = () => {
   const [joke, setJoke] = useState('');
