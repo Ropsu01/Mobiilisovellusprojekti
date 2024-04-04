@@ -101,7 +101,6 @@ export default function TaskList() {
         setIsEditModalVisible(false);
     }
 
-
     const renderTodo = ({ item, index }) => {
         const ref = doc(firestore, `todos/${item.id}`)
 
