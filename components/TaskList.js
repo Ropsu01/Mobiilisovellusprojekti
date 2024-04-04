@@ -5,12 +5,14 @@ import { firestore } from '../firebase/Config'
 import { AppRegistry } from 'react-native';
 import App from '../App';
 AppRegistry.registerComponent('MyApp', () => App);
-import IconIonicons from 'react-native-vector-icons/Ionicons';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
 import { Alert } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+
 
 export default function TaskList() {
-    const [todos, setTodos] = useState([])
+    const [todos, setTodos] = useState([]) 
     const [todo, setTodo] = useState('')
     const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -20,7 +22,7 @@ export default function TaskList() {
         const q = query(collection(firestore, 'todos'))
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const tempTodos = [] 
+            const tempTodos = []  
 
             querySnapshot.forEach((doc) => {
                 const todoObject = {
@@ -119,17 +121,6 @@ export default function TaskList() {
         )
     }
 
-    const onDragEnd = async ({ data }) => {
-        const batch = [];
-        data.forEach((item, index) => {
-            const ref = doc(firestore, `todos/${item.id}`);
-            batch.push(updateDoc(ref, { order: index }));
-        });
-        await Promise.all(batch);
-    
-        // Päivitä tila vasta kun järjestys on tallennettu tietokantaan
-        setTodos(data);
-    }
 
     return (
         <GestureHandlerRootView style={styles.container}>
