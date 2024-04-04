@@ -9,7 +9,7 @@ export default function App() {
   );
 }
 
-styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
       backgroundColor: 'lightgrey',
       color: 'black',
