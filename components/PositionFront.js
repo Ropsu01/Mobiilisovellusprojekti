@@ -1,10 +1,10 @@
 import * as Location from 'expo-location';
-import Weather from './Weather';
 import FrontWeather from './WeatherFrontPage';
+import Weather from './Weather';
 import React, { useState, useEffect} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function Position() {
+export default function FrontPageWeather() {
     const [latitude, setLatitude] = useState(0)
     const [longitude, setLongitude] = useState(0)
     const [message, setMessage] = useState('Haetaan paikkatietoja...')
@@ -33,10 +33,7 @@ export default function Position() {
 
     return (
         <View>
-            {isLoading === false && <Weather latitude={latitude} longitude={longitude} />}
+            {isLoading === false && <FrontWeather latitude={latitude} longitude={longitude} />}
         </View>
-        
     )
 }
-
-

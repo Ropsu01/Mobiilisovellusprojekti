@@ -1,4 +1,3 @@
-
 import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, ScrollView, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore'
@@ -9,6 +8,7 @@ AppRegistry.registerComponent('MyApp', () => App);
 import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
 import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 
 
 
