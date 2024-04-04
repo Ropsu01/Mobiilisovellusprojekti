@@ -146,7 +146,7 @@ export default function Calendar() {
         style={styles.addButton}
         onPress={() => setModalVisible(true)}
       >
-        <Icon name="add" size={24} color="#FFF" />
+        <Icon name="add" size={24} color="#FBFADA" />
       </TouchableOpacity>
   
       <Modal
@@ -197,67 +197,67 @@ export default function Calendar() {
   );
                 }  
 
-const styles = StyleSheet.create({
-  modalContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: '30%',
-    marginBottom: '30%',
-    marginHorizontal: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  addButton: {
-    position: 'absolute',
-    right: 30,
-    bottom: 30,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#1a8f3f',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8, // Shadow for Android
-    shadowColor: '#000', // Shadow for iOS
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-  },
-  noteInput: {
-    width: '100%',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    backgroundColor: '#f8f8f8',
-  },
-  notesSection: {
-    padding: 10,
-    marginTop: 10,
-  },
-  noteContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 5,
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#ABD7AA',
-  },
-  noteText: {
-    flex: 1,
-    fontSize: 16,
-  },
-});
+                const styles = StyleSheet.create({
+                  modalContent: {
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: '30%',
+                    marginBottom: '30%',
+                    marginHorizontal: 20,
+                    backgroundColor: '#FBFADA', // Very Light Yellow for modal background
+                    borderRadius: 20,
+                    padding: 35,
+                    shadowColor: '#12372A', // Deep Green for shadow
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5,
+                  },
+                  addButton: {
+                    position: 'absolute',
+                    right: 30,
+                    bottom: 30,
+                    width: 56,
+                    height: 56,
+                    borderRadius: 28,
+                    backgroundColor: '#436850', // Medium Green for add button
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    elevation: 8,
+                    shadowColor: '#000',
+                    shadowOpacity: 0.3,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowRadius: 4,
+                  },
+                  noteInput: {
+                    width: '100%',
+                    marginBottom: 20,
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
+                    borderColor: '#436850', // Medium Green for border
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    backgroundColor: '#FBFADA', // Very Light Yellow for input background
+                  },
+                  notesSection: {
+                    padding: 10,
+                    marginTop: 10,
+                  },
+                  noteContainer: {
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 5,
+                    padding: 10,
+                    borderRadius: 5,
+                    backgroundColor: '#ADBC9F', // Light Greenish-Gray for note container
+                  },
+                  noteText: {
+                    flex: 1,
+                    fontSize: 16,
+                  },
+                });

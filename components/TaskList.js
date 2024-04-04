@@ -1,7 +1,10 @@
-import { View, Text, Button } from 'react-native'
+import { View, Text, Button, StyleSheet } from 'react-native'
 import React, { useEffect } from 'react'
 import { collection, addDoc } from 'firebase/firestore'
 import { firestore } from '../firebase/Config'
+import { AppRegistry } from 'react-native';
+import App from '../App'; // olettaen että pääkomponenttisi on App.js 
+AppRegistry.registerComponent('MyApp', () => App);
 
 
 
