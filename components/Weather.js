@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, ScrollView, FlatList, StyleSheet} from 'react-native';
 
 const api = {
     url: process.env.EXPO_PUBLIC_API_URL,
@@ -61,22 +61,22 @@ const renderDailyHeader = () => (
     );
 
     const renderDailyItem = ({ item }) => {
-        const date = new Date(item.dt * 1000);
-        const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
-        const formattedDate = date.toLocaleDateString('fi-FI', options);
-        return (
-            <View style={styles.dailyForecastItem}>
-                <Text>{formattedDate}</Text>
-                <Image
-                    source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
-                    style={{ width: 50, height: 50 }}
-                />
-                <Text>{item.weather[0].description}</Text>
-                <Text>{`Lämpötila: ${item.temp.day}°C`}</Text>
-                <Text>{`Tuntuu kuin: ${item.feels_like.day}°C`}</Text>
-            </View>
-        );
-    };
+    const date = new Date(item.dt * 1000);
+    const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+    const formattedDate = date.toLocaleDateString('fi-FI', options);
+    return (
+        <View style={styles.dailyForecastItem}>
+            <Text>{formattedDate}</Text>
+            <Image
+                source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
+                style={{ width: 50, height: 50 }}
+            />
+            <Text>{item.weather[0].description}</Text>
+            <Text>{`Lämpötila: ${item.temp.day}°C`}</Text>
+            <Text>{`Tuntuu kuin: ${item.feels_like.day}°C`}</Text>
+        </View>
+    );
+};
 
     return (
         <View style={styles.container}>
@@ -106,28 +106,36 @@ const renderDailyHeader = () => (
     );
 }
 
+
 const styles = StyleSheet.create({
     container: {
-        width: 330,
-        backgroundColor: 'ABDCAA',
-        color: 'ABDCAA',
+        width: 360,
     },
     currentWeather: {
+        marginTop: 10,
         alignItems: 'center', // Center items horizontally
         paddingBottom: 10, // Add padding at the bottom of the current weather container
-        borderBottomWidth: 1, // Add a border at the bottom of the current weather container
+        backgroundColor: 'white',
+        borderRadius: 10,
+        marginBottom: 10, 
     },
     hourlyForecastContainer: {
-        minHeight: 150, // Set minimum height to ensure scrollability
+        height: 150, // Set minimum height to ensure scrollability
+        backgroundColor: 'white',
+        borderRadius: 10,
+        minWidth: 360,
+        marginBottom: 10,
     },
     dailyForecastContainer: {
         maxHeight: 300, // Limit the height of the daily forecast container
+        backgroundColor: 'white',
+        borderRadius: 10,
     },
     hourlyForecastItem: {
         alignItems: 'center', // Center items horizontally
-        paddingVertical: 10, // Vertical padding to separate items
-        paddingHorizontal: 5, // Horizontal padding to separate items
-        borderBottomWidth: 1, // Add a border at the bottom of each hourly forecast item
+        borderRadius: 10,
+        paddingVertical: 10, // Add padding to separate items
+        paddingHorizontal: 5, // Add padding to separate items
     },
     dailyForecastItem: {
         alignItems: 'center', // Center items horizontally
