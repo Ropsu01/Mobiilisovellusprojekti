@@ -3,17 +3,15 @@ import React, { useEffect, useState } from 'react'
 import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore } from '../firebase/Config'
 import { AppRegistry } from 'react-native';
-import App from '../App'; // olettaen että pääkomponenttisi on App.js 
+import App from '../App';
 AppRegistry.registerComponent('MyApp', () => App);
-import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
-import DraggableFlatList from 'react-native-draggable-flatlist';
+import IconIonicons from 'react-native-vector-icons/Ionicons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NestableScrollContainer, NestableDraggableFlatList } from "react-native-draggable-flatlist"
-
+import { Alert } from 'react-native';
 
 
 export default function TaskList() {
-    const [todos, setTodos] = useState([])  // Muuta tämä
+    const [todos, setTodos] = useState([])
     const [todo, setTodo] = useState('')
     const todosRef = useRef([]);
     //const [draggingTaskId, setDraggingTaskId] = useState(null);
@@ -23,7 +21,7 @@ export default function TaskList() {
         const q = query(collection(firestore, 'todos'))
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const tempTodos = []  // Muuta tämä
+            const tempTodos = [] 
 
             querySnapshot.forEach((doc) => {
                 const todoObject = {
