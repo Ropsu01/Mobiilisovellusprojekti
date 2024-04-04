@@ -20,15 +20,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 0,
-    backgroundColor: 'White',
+    backgroundColor: 'lightgrey',
   },
   container2: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: 'lightgrey',
     color: '#ABDCAA',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 20,
+    margin: 0,
     borderRadius: 10,
   },
   heading: {
