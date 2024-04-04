@@ -4,19 +4,16 @@ import React, { useEffect, useState } from 'react'
 import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { firestore } from '../firebase/Config'
 import { AppRegistry } from 'react-native';
-import App from '../App'; // olettaen että pääkomponenttisi on App.js 
+import App from '../App';
 AppRegistry.registerComponent('MyApp', () => App);
 import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
-import DraggableFlatList from 'react-native-draggable-flatlist';
+import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NestableScrollContainer, NestableDraggableFlatList } from "react-native-draggable-flatlist"
-
-
 
 
 
 export default function TaskList() {
-    const [todos, setTodos] = useState([])  // Muuta tämä
+    const [todos, setTodos] = useState([]) 
     const [todo, setTodo] = useState('')
     const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -26,7 +23,7 @@ export default function TaskList() {
         const q = query(collection(firestore, 'todos'))
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const tempTodos = []  // Muuta tämä
+            const tempTodos = []  
 
             querySnapshot.forEach((doc) => {
                 const todoObject = {
@@ -38,7 +35,7 @@ export default function TaskList() {
                 tempTodos.push(todoObject)  // Muuta tämä
             })
             console.log("Fetched todos", tempTodos); // Debugging line
-            setTodos(tempTodos.reverse())  // Muuta tämä
+            setTodos(tempTodos)  // Muuta tämä
         })
 
         return () => {
@@ -72,8 +69,16 @@ export default function TaskList() {
     const renderTodo = ({ item, index }) => {
         const ref = doc(firestore, `todos/${item.id}`)
 
-        const toggleDone = async () => {
-            updateDoc(ref, { done: !item.done })
+        const toggleDone = async (id) => {
+            const ref = doc(firestore, `todos/${id}`);
+            const updatedDoneState = !todos.find(todo => todo.id === id).done;
+            await updateDoc(ref, { done: updatedDoneState });
+        
+            // Poista tehtävä taulukosta
+            const updatedTodos = todos.filter(todo => todo.id !== id);
+            // Lisää tehtävä taulukon loppuun
+            const updatedTodo = { ...todos.find(todo => todo.id === id), done: updatedDoneState };
+            setTodos([...updatedTodos, updatedTodo]);
         }
         const deleteItem = async () => {
             Alert.alert(
@@ -107,10 +112,7 @@ export default function TaskList() {
             //         style={styles.todo}
             // >
             <View style={[styles.todoContainer]}>
-                <TouchableOpacity
-                    onPress={toggleDone}
-                    style={styles.todo}
-                >
+                <TouchableOpacity onPress={() => toggleDone(item.id)} style={styles.todo}>
                     {item.done && <IconIonicons name='checkbox' size={30} color={'#1a8f3f'} />}
                     {!item.done && <IconIonicons name='square-outline' size={30} color={'#79747E'} />}
                     <Text style={styles.todoText}>{item.text}</Text>
