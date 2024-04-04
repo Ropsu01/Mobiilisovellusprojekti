@@ -1,100 +1,121 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { AppRegistry } from 'react-native';
-import App from '../App';
-AppRegistry.registerComponent('MyApp', () => App);
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { collection, addDoc, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { firestore } from '../firebase/Config';
 
 const JokesAndFacts = () => {
   const [joke, setJoke] = useState('');
   const [funFact, setFunFact] = useState('');
-  const [lastUpdatedDay, setLastUpdatedDay] = useState(0);
+  const [favorites, setFavorites] = useState([]);
+  const [showFavorites, setShowFavorites] = useState(false);
 
-  const jokes = [
-    "Mitä astronautti tokaisi löydettyään luurangon kuusta? - Mitä kuuluu?",
-    "Mikä on Maija Mehiläisen isän nimi? - Faija Mehiläinen!",
-    "Miksi hai ei voi olla taksikuski? - Koska se voi olla liikenteelle haitaksi!",
-    "Kaksi lehmää oli kaurismetsällä. Hetken päästä toinen näki kauriin ja kuiskasi toiselle. - Shh... Ei ammuta",
-    "Mitä kala tekee tupakkatehtaassa? - Sätkii",
-    "Mikä on maailman paras vihannes? - Best Selleri",
-    "Mitä laivan työntekijä pukee päälleen mennessään töihin? - Alusvaatteet.",
-    "Kuka vetää lintujen AA-kerhoa? - Selvä pyy.",
-    "Mistä kankaasta kummitusten vaatteet on tehty? - Buuvillasta.",
-    "Mikä Postimies Patesta tuli, kun hän jäi eläkeelle? - Pate",
-    "Mikä on pilates suomeksi? - Melilosvot",
-    "Mitä Puolalainen teki altaassa? - Polski",
-    "Mikä on maailman yksinkertaisin peli? - Simppeli",
-    "Miksi Aki syö pullaa sateella? - Ei vaivannut keliakia",
-    "Mikä tuli USA:n jälkeen? - USB",
-    "Mitä Espanjalainen sanoi nähdessään hyvän diaesityksen? - Buenos Dias",
-    "Mitä eroa on mustilla ja vihreillä oliiveilla? - Musti on koira",
+  useEffect(() => {
+    const fetchData = async () => {
+      const jokesSnapshot = await getDocs(collection(firestore, 'jokes'));
+      const jokesData = jokesSnapshot.docs.map(doc => doc.data());
+      const randomJokeIndex = Math.floor(Math.random() * jokesData.length);
+      setJoke(jokesData[randomJokeIndex]);
+      console.log("Fetched jokes", jokesData); // Debugging line
+      const factsSnapshot = await getDocs(collection(firestore, 'facts'));
+      const factsData = factsSnapshot.docs.map(doc => doc.data());
+      const randomFactIndex = Math.floor(Math.random() * factsData.length);
+      setFunFact(factsData[randomFactIndex]);
+      console.log("Fetched facts", factsData); // Debugging line
+    };
 
-    // Add more jokes here
-  ];
+    fetchData();
 
-  const facts = [
-    "Suomi on maailman 'sisukkain' kansa, sillä sanalla ei ole käännöstä muille kielille.",
-    "Suomen lipun sininen väri edustaa tuhansia järvemme, ja valkoinen puhtautta ja lunta.",
-    "Aivastat noin 100 kertaa päivässä, jos olet allerginen.",
-    "Krokotiilit itse asiassa itkevät kun he syövät.",
-    "Karhut ovat oikeakätisiä.",
-    "Koira on ainoa eläin, joka osaa lukea ihmisen kasvoja.",
-    "Auringonpimennys tapahtuu noin joka 18 kuukauden välein ja kestää vain muutaman minuutin.",
-    "Maapallon kiertorata on noin 940 miljoonaa kilometriä.",
-    "Kuun painovoima on noin 1/6 maan painovoimasta.",
-    "Siilillä on noin 7000 piikkiä kehossaan.",
-    "Krokotiilit voivat elää jopa 100 vuotta.",
-    "Muurahaiset nukkuvat 8 minuuttia päivässä, mikä tekee niistä eläinmaailman lyhimmän unen nukkujat.",
-    "Eiffel-torni voi olla jopa 15 senttiä korkeampi kesällä lämpölaajenemisen vuoksi.",
-    "Skotlannin kansalliseläin on yksisarvinen",
-    "Mustekalalla on kolme sydäntä.",
-    "Sitruuna kelluu, mutta lime ei.",
-    "Eläimet voivat olla allergisia ihmisille.",
-    "Australia on leveämpi kuin Kuu.",
-    "Paavi ei voi toimia elinluovuttajana.",
-    "Lepakot ovat ainoita lentäviä nisäkkäitä",
-    "Ihmiskehon pienin luu sijaitsee korvassa.",
-    "Maailman vanhin kirjoitettu resepti on yli 4000 vuotta vanha.",
-    "Maailmassa on vain yksi maa, jossa ei ole hyttysiä - Islanti.",
-    "Suomessa on enemmän saunoja kuin autoja.",
-    "Kynnet kasvavat nopeammin kesällä kuin talvella.",
-    "Venäjällä on 11 eri aikavyöhykettä.",
+    // Fetch new jokes and facts every 24 hours
+    const intervalId = setInterval(fetchData, 24 * 60 * 60 * 1000);
 
-    // Add more facts here
-  ];
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, []);
 
-  // Funktio valitsee satunnaisen vitsin tai faktan
-  const getRandomContent = (contentArray) => {
-    const randomIndex = Math.floor(Math.random() * contentArray.length);
-    return contentArray[randomIndex];
-  };
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      const favoritesSnapshot = await getDocs(collection(firestore, 'favorites'));
+      const favoritesData = favoritesSnapshot.docs.map(doc => doc.data().favorites);
+      setFavorites(favoritesData[0] || []);
+    };
 
-  // Funktio päivittää vitsin ja faktan päivittäin
-  const updateDailyContent = () => {
-    const today = new Date().getDate();
-    if (today !== lastUpdatedDay) {
-      const newJoke = getRandomContent(jokes);
-      const newFact = getRandomContent(facts);
-      setJoke(newJoke);
-      setFunFact(newFact);
-      setLastUpdatedDay(today);
+    fetchFavorites();
+  }, []);
+
+  const toggleFavorite = async (content) => {
+    if (favorites.includes(content)) {
+      const updatedFavorites = favorites.filter((item) => item !== content);
+      setFavorites(updatedFavorites);
+      await deleteFavoriteFromFirestore(content);
+    } else {
+      const updatedFavorites = [...favorites, content];
+      setFavorites(updatedFavorites);
+      await addFavoriteToFirestore(content);
     }
   };
 
-  // Kutsutaan päivitysfunktiota komponentin ensimmäisellä renderöinnillä
-  useEffect(() => {
-    updateDailyContent();
-  }, []);
+  const addFavoriteToFirestore = async (content) => {
+    try {
+      const favoritesCollection = collection(firestore, 'favorites');
+      await setDoc(doc(favoritesCollection, 'userFavorites'), { favorites: [...favorites, content] });
+      console.log('Favorite added to Firestore');
+    } catch (error) {
+      console.error('Error adding favorite to Firestore: ', error);
+    }
+  };
+
+  const deleteFavoriteFromFirestore = async (content) => {
+    try {
+      const favoritesCollection = collection(firestore, 'favorites');
+      await deleteDoc(doc(favoritesCollection, 'userFavorites'));
+      console.log('Favorite deleted from Firestore');
+    } catch (error) {
+      console.error('Error deleting favorite from Firestore: ', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={updateDailyContent} style={styles.card}>
+      {/* Päivän vitsi */}
+      <View style={styles.card}>
         <Text style={styles.title}>Päivän Vitsi:</Text>
-        <Text style={styles.content}>{joke}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={updateDailyContent} style={styles.card}>
+        <Text style={styles.content}>{joke.joke}</Text>
+        <MaterialIcons
+          name={favorites.includes(joke.joke) ? "star" : "star-border"}
+          size={24}
+          color={favorites.includes(joke.joke) ? "gold" : "gold"}
+          onPress={() => toggleFavorite(joke.joke)}
+        />
+      </View>
+
+      {/* Päivän fakta */}
+      <View style={styles.card}>
         <Text style={styles.title}>Hauska Fakta:</Text>
-        <Text style={styles.content}>{funFact}</Text>
+        <Text style={styles.content}>{funFact.fact}</Text>
+        <MaterialIcons
+          name={favorites.includes(funFact.fact) ? "star" : "star-border"}
+          size={24}
+          color={favorites.includes(funFact.fact) ? "gold" : "gold"}
+          onPress={() => toggleFavorite(funFact.fact)}
+        />
+      </View>
+
+      {/* Suosikit */}
+      <TouchableOpacity onPress={() => setShowFavorites(!showFavorites)} style={styles.favoriteList}>
+        <Text style={styles.favoriteTitle}>Suosikit:</Text>
+        <MaterialIcons name={showFavorites ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={24} color="black" />
       </TouchableOpacity>
+
+      {showFavorites && (
+        <ScrollView style={styles.favoriteList}>
+          {favorites.map((item, index) => (
+            <View key={index} style={styles.favoriteItemContainer}>
+              <Text style={styles.favoriteItem}>{item}</Text>
+              <MaterialIcons name="clear" size={24} color="red" onPress={() => toggleFavorite(item)} />
+            </View>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -121,6 +142,28 @@ const styles = StyleSheet.create({
   },
   content: {
     fontSize: 16,
+  },
+  favoriteList: {
+    marginTop: 10,
+    width: '100%',
+    maxHeight: 200,
+  },
+  favoriteTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  favoriteItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  favoriteItem: {
+    flex: 1,
+    fontSize: 16,
+    marginRight: 10,
   },
 });
 
