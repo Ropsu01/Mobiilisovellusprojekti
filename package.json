@@ -22,6 +22,7 @@
     "dotenv": "^16.4.5",
     "expo": "~50.0.13",
     "expo-firebase": "^0.0.0-alpha.0",
+    "expo": "^50.0.13",
     "expo-location": "^16.5.5",
     "expo-status-bar": "~1.11.1",
     "firebase": "^10.10.0",
