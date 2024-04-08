@@ -55,12 +55,12 @@ function TabNavigator() {
             tabBarStyle: { 
                 backgroundColor: '#436850', // Navbar color
                 paddingBottom: 0, // You may need to adjust this for proper alignment
-                height: 80, // Adjust as needed for label text
+                height: 55, // Adjust as needed for label text
             },
             tabBarLabelStyle: {
               
                 fontSize: 10, // Adjust the size of the label text as needed
-                marginBottom: 30, // Adjust for spacing between the icon and text
+                marginBottom: 5, // Adjust for spacing between the icon and text
             },
             // tabBarOptions is deprecated in v6, so make sure to move these into screenOptions
             tabBarActiveTintColor: '#ADBC9F',
