@@ -41,6 +41,7 @@ export default function FrontWeather(props) {
             setFrontError(error.message); 
             console.error(error);
         });
+
     }, [props.latitude, props.longitude]); 
 
     return (
@@ -51,6 +52,7 @@ export default function FrontWeather(props) {
             <>
                 <View style={styles.leftContainer}>
                     <Text style={styles.city}>{cityName}</Text> 
+
                     {frontIcon && <Image source={{ uri: frontIcon }} style={{ width: 100, height: 100 }} />}
                     <Text style={styles.desc}>{frontDescription}</Text>
                 </View>
