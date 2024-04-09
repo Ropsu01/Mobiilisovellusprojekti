@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     },
     leftContainer: {
         flexDirection: 'column', // Set the left container's direction to column
+        alignItems: 'center', // Center children horizontally
     },
     rightContainer: {
         flexDirection: 'column', // Set the right container's direction to column
