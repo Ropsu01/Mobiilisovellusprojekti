@@ -5,6 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LocaleConfig } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import Icon
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { firestore } from '../firebase/Config'
+import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+
 
 
 
@@ -71,32 +74,51 @@ export default function Calendar() {
   };
 
   const saveNote = async () => {
-    const newNote = { text: noteText, time: timeInput }; // Use object with text and time
-    const updatedNotes = {
-      ...notes,
-      [selectedDate]: [...(notes[selectedDate] || []), newNote] // Save the newNote object
+    if (!noteText.trim()) {
+      alert("Note cannot be empty.");
+      return;
+    }
+  
+    const newEvent = {
+      date: selectedDate,
+      text: noteText,
+      time: timeInput, // Ensure this is a string or convert to desired format
     };
+  
     try {
-      setNotes(updatedNotes);
-      await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+      await addDoc(collection(firestore, "events"), newEvent);
+      setNoteText('');
+      setTimeInput('');
+      console.log("Event saved successfully");
       setModalVisible(false);
     } catch (error) {
-      console.error("Failed to save the note to AsyncStorage", error);
+      console.error("Error saving event to Firestore:", error);
     }
   };
+  
 
-  const deleteNote = async (date, noteIndex) => {
-    const updatedNotesForDate = notes[date].filter((_, index) => index !== noteIndex);
-    const updatedNotes = { ...notes, [date]: updatedNotesForDate };
-
+  const deleteNote = async (date, eventId) => {
     try {
-      setNotes(updatedNotes);
-      await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-      setDetailsModalVisible(false); // Close details modal after deletion
+        await deleteDoc(doc(firestore, `events/${eventId}`));
+        console.log("Event deleted successfully");
+
+        // Update local state to reflect the deletion
+        const updatedNotesForDate = notes[date]?.filter(event => event.id !== eventId) || [];
+        if (updatedNotesForDate.length === 0) {
+            const { [date]: value, ...remainingNotes } = notes;
+            setNotes(remainingNotes);
+        } else {
+            setNotes({ ...notes, [date]: updatedNotesForDate });
+        }
+
+        setDetailsModalVisible(false); // Close the modal immediately after successful deletion
     } catch (error) {
-      console.error("Failed to delete the note from AsyncStorage", error);
+        console.error("Error deleting event:", error);
     }
-  };
+};
+
+
+  
 
   const getMarkedDates = () => {
     const marked = Object.keys(notes).reduce((acc, date) => {
@@ -115,7 +137,7 @@ export default function Calendar() {
   const openNoteDetails = (date, index, note) => {
     setActiveNote({
       date,
-      index,
+      id: note.id, // Ensure this includes the Firestore document ID
       text: note.text,
       time: note.time // Ensure the time is set here
     });
@@ -123,23 +145,37 @@ export default function Calendar() {
   };
 
   const updateNote = async () => {
-    // Copy the notes object
-    const updatedNotes = { ...notes };
-    // Update the specific note with the new text and time
-    if (activeNote.date in updatedNotes && activeNote.index !== -1) {
-      updatedNotes[activeNote.date][activeNote.index] = {
+    if (!activeNote.id) {
+      console.error("Note ID is missing");
+      return;
+    }
+  
+    try {
+      const noteRef = doc(firestore, `events/${activeNote.id}`);
+      await updateDoc(noteRef, {
         text: activeNote.text,
         time: activeNote.time,
-      };
-      try {
-        await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-        setNotes(updatedNotes); // Update state
-        setDetailsModalVisible(false); // Close the modal
-      } catch (error) {
-        console.error("Failed to update the note in AsyncStorage", error);
+      });
+  
+      console.log("Note updated successfully");
+  
+      // Optionally, refresh notes from Firestore or update local state directly
+      // Here we're directly updating local state for immediate UI feedback
+      const updatedNotes = { ...notes };
+      const noteList = updatedNotes[activeNote.date];
+      const noteIndex = noteList.findIndex(note => note.id === activeNote.id);
+      if (noteIndex > -1) {
+        noteList[noteIndex] = { ...noteList[noteIndex], text: activeNote.text, time: activeNote.time };
+        updatedNotes[activeNote.date] = noteList;
+        setNotes(updatedNotes);
       }
+  
+      setDetailsModalVisible(false); // Close the modal
+    } catch (error) {
+      console.error("Error updating note:", error);
     }
   };
+  
 
   const formatTimeInput = (text) => {
     const newText = text.replace(/[^0-9]/g, ''); // Remove non-numeric characters
@@ -160,6 +196,24 @@ export default function Calendar() {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   };
+
+  useEffect(() => {
+    const q = query(collection(firestore, "events"), orderBy("date"));
+  
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const events = {};
+      querySnapshot.forEach((doc) => {
+        const eventData = doc.data();
+        const { date } = eventData;
+        if (!events[date]) events[date] = [];
+        events[date].push({ id: doc.id, ...eventData });
+      });
+      setNotes(events);
+    });
+  
+    return () => unsubscribe();
+  }, []);
+  
 
 
 
@@ -191,10 +245,11 @@ export default function Calendar() {
                   .sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time)) // Sort notes by time
                   .map((note, index) => (
                     <NoteContainer
-                      key={index}
-                      note={note}
-                      onOpen={() => openNoteDetails(selectedDate, index, note)}
-                    />
+  key={note.id}
+  note={note} // Corrected from {event} to {note}
+  onOpen={() => openNoteDetails(selectedDate, index, note)} // Corrected as well
+/>
+
                   ))}
               </View>
             )}
@@ -211,83 +266,87 @@ export default function Calendar() {
       </TouchableOpacity>
 
       <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.modalContent}>
-          <TouchableOpacity 
-        onPress={() => setModalVisible(false)}
-        style={styles.closeButtonStyle}
-      >
-  <Text style={styles.closeButtonText}>Kumoa</Text>
-      </TouchableOpacity>
-            <TextInput
-              style={styles.noteInput}
-              placeholder="Lisää tapahtuma..."
-              placeholderTextColor="#9C9C9C"
-              value={noteText}
-              onChangeText={setNoteText}
-              multiline
-              numberOfLines={4}
-            />
-            <TextInput
-              style={styles.timeInput}
-              placeholder="Kellonaika (HH:MM)"
-              placeholderTextColor="#9C9C9C"
-              keyboardType="numeric"
-              maxLength={5}
-              value={timeInput}
-              onChangeText={(text) => setTimeInput(formatTimeInput(text))}
-            />
-            <Button title="Tallenna" onPress={saveNote} color="#1a8f3f" />
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+  animationType="fade"
+  transparent={true}
+  visible={modalVisible}
+  onRequestClose={() => setModalVisible(false)}
+>
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    {/* Outer View acting as an overlay */}
+    <View style={styles.overlayStyle}>
+      <View style={styles.modalContent}>
+        <TouchableOpacity 
+          onPress={() => setModalVisible(false)}
+          style={styles.closeButtonStyle}
+        >
+          <Text style={styles.closeButtonText}>Kumoa</Text>
+        </TouchableOpacity>
+        <TextInput
+          style={styles.noteInput}
+          placeholder="Lisää tapahtuma..."
+          placeholderTextColor="#9C9C9C"
+          value={noteText}
+          onChangeText={setNoteText}
+          multiline
+          numberOfLines={4}
+        />
+        <TextInput
+          style={styles.timeInput}
+          placeholder="Kellonaika (HH:MM)"
+          placeholderTextColor="#9C9C9C"
+          keyboardType="numeric"
+          maxLength={5}
+          value={timeInput}
+          onChangeText={(text) => setTimeInput(formatTimeInput(text))}
+        />
+        <Button title="Tallenna" onPress={saveNote} color="#1a8f3f" />
+        
+      </View>
+    </View>
+  </TouchableWithoutFeedback>
+</Modal>
 
-      <Modal
-  animationType="slide"
+
+<Modal
+  animationType="fade"
   transparent={true}
   visible={detailsModalVisible}
   onRequestClose={() => setDetailsModalVisible(false)}
 >
   <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-    <View style={styles.modalContent}>
-      <TouchableOpacity 
-        onPress={() => setDetailsModalVisible(false)} 
-        style={styles.closeButtonStyle}
-      >
-        <Text style={styles.closeButtonText}>Kumoa</Text>
-      </TouchableOpacity>
-
-      {/* The rest of your modal content */}
-      <TextInput
-        style={styles.noteInput}
-        value={activeNote.text}
-        onChangeText={(text) => setActiveNote(prev => ({ ...prev, text }))}
-        multiline
-        numberOfLines={4}
-      />
-      <TextInput
-        style={styles.timeInput}
-        placeholder="Kellonaika (HH:MM)"
-        placeholderTextColor="#9C9C9C"
-        keyboardType="numeric"
-        maxLength={5}
-        value={activeNote.time}
-        onChangeText={(text) => setActiveNote(prevState => ({
-          ...prevState,
-          time: formatTimeInput(text)
-        }))}
-      />
-
-      <Button title="Tallenna" onPress={updateNote} color="#1a8f3f" />
-      <Button title="Poista" onPress={() => deleteNote(activeNote.date, activeNote.index)} color="#ff6347" />
+    <View style={styles.overlayStyle}>
+      <View style={styles.modalContent}>
+        <TouchableOpacity 
+          onPress={() => setDetailsModalVisible(false)}
+          style={styles.closeButtonStyle}
+        >
+          <Text style={styles.closeButtonText}>Kumoa</Text>
+        </TouchableOpacity>
+        <TextInput
+          style={styles.noteInput}
+          placeholder="Muokkaa tapahtumaa..."
+          placeholderTextColor="#9C9C9C"
+          value={activeNote.text}
+          onChangeText={(text) => setActiveNote({ ...activeNote, text })}
+          multiline
+          numberOfLines={4}
+        />
+        <TextInput
+          style={styles.timeInput}
+          placeholder="Kellonaika (HH:MM)"
+          placeholderTextColor="#9C9C9C"
+          keyboardType="numeric"
+          maxLength={5}
+          value={activeNote.time}
+          onChangeText={(text) => setActiveNote({ ...activeNote, time: formatTimeInput(text) })}
+        />
+        <Button title="Tallenna" onPress={updateNote} color="#1a8f3f" />
+        <Button title="Poista" onPress={() => deleteNote(activeNote.date, activeNote.id)} color="#ff6347" />
+      </View>
     </View>
   </TouchableWithoutFeedback>
 </Modal>
+
 
     </View>
   );
@@ -295,14 +354,15 @@ export default function Calendar() {
 
 const styles = StyleSheet.create({
   modalContent: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '30%',
-    marginBottom: '30%',
+    marginTop: '20%', // Reduced from '50%'
+    marginBottom: '20%', // Significantly reduced from '80%'
     marginHorizontal: 20,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
+    width: '90%', // This ensures the modal content does not exceed the screen width while maintaining a consistent size
+
     padding: 35,
     shadowColor: '#12372A',
     shadowOffset: {
@@ -313,6 +373,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  
   modalHeader: {
     position: 'absolute', // Position absolutely to place it on top left
     top: 0, // Align to the top of the modal
@@ -320,6 +381,7 @@ const styles = StyleSheet.create({
     width: '100%', // Ensure it spans the width of the modal for alignment
     padding: 10, // Add some padding around the content
     alignItems: 'flex-start', // Align items (buttons, etc.) to the start (left)
+    
   },
   addButton: {
     position: 'absolute',
@@ -338,7 +400,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   noteInput: {
-    width: '100%',
+    width: '70%',
+    marginTop: 20, // Add top margin to create space
     marginBottom: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -346,7 +409,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     backgroundColor: '#FFFFFF',
-    fontSize: 20, // Slightly larger font
+    fontSize: 16, // Slightly larger font
 
   },
   notesSection: {
@@ -378,7 +441,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#FFFFFF', // Matching the note input background
     textAlign: 'left', // Align text to the left to match the note input (or 'center' if you prefer)
-    fontSize: 18, // Slightly larger font
+    fontSize: 16, // Slightly larger font
+    width: '70%',
+
 
   },
 
@@ -395,6 +460,14 @@ const styles = StyleSheet.create({
     color: '#ff6347', // Example text color
     fontSize: 16, // Adjust font size as needed
   },
+
+  overlayStyle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // This creates the darkening effect
+  },
+  
   
 
 

@@ -162,7 +162,6 @@ export default function TaskList() {
 
                     {item.done && <IconIonicons name='checkbox' size={30} color={'#1a8f3f'} />}
 
-                    {item.done && <IconIonicons name='checkbox' size={30} color={'#436850'} />}
 
                     {!item.done && <IconIonicons name='square-outline' size={30} color={'#79747E'} />}
                     <Text style={styles.todoText}>{item.text}</Text>
