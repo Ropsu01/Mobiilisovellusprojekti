@@ -1,7 +1,7 @@
 
 import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, ScrollView, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore'
+import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDocs, where } from 'firebase/firestore'
 import { firestore } from '../firebase/Config'
 import { AppRegistry } from 'react-native';
 import App from '../App';
@@ -11,15 +11,19 @@ import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
+export default function TaskList( { listId, listName }) {
 
-export default function TaskList() {
     const [todos, setTodos] = useState([])
     const [todo, setTodo] = useState('')
     const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
-
     useEffect(() => {
+
+        if (!listId) return;
+
+        const q = query(collection(firestore, 'todos'), where('listId', '==', listId));
+
         // Tämä useEffect-hook tarkkailee muutoksia todos-tilassa ja reagoi niihin
         const lastTodo = todos[todos.length - 1];
         if (lastTodo && lastTodo.done) {
@@ -27,7 +31,6 @@ export default function TaskList() {
             setTodos([...updatedTodos, lastTodo]);
         }
 
-        const q = query(collection(firestore, 'todos'))
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const tempTodos = []
@@ -37,6 +40,7 @@ export default function TaskList() {
                     id: doc.id,
                     text: doc.data().text,
                     done: doc.data().done,
+                    listId: doc.data().listId, // Lisäätään kenttä listan tunnistetiedolle
                     //created: convertFirebaseTimeStampToJS(doc.data().created)
                 }
                 tempTodos.push(todoObject)  // Muuta tämä
@@ -48,7 +52,7 @@ export default function TaskList() {
         return () => {
             unsubscribe()
         }
-    }, [])
+    }, [listId])
 
     const deleteAllTodos = async () => {
         Alert.alert(
@@ -87,7 +91,7 @@ export default function TaskList() {
             Alert.alert('Tyhjä tehtävä', 'Tehtävä ei voi olla tyhjä');
             return;
         }
-        const doc = await addDoc(collection(firestore, 'todos'), { text: todo, done: false });
+        const doc = await addDoc(collection(firestore, 'todos'), { text: todo, done: false, listId: listId});
         setTodo('')
     }
 
@@ -162,13 +166,12 @@ export default function TaskList() {
 
                     {item.done && <IconIonicons name='checkbox' size={30} color={'#1a8f3f'} />}
 
-                    {item.done && <IconIonicons name='checkbox' size={30} color={'#436850'} />}
 
                     {!item.done && <IconIonicons name='square-outline' size={30} color={'#79747E'} />}
                     <Text style={styles.todoText}>{item.text}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 25 }} onPress={() => openEditModal(item.id, item.text)}>
-                    <IconIonicons name='create-outline' size={25} color='#79747E' />
+                    <IconIonicons name='pencil' size={25} color='#79747E' />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={deleteItem}>
                     <IconIonicons name='trash-outline' size={25} color='#79747E' />
