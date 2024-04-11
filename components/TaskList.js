@@ -5,10 +5,11 @@ import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteD
 import { firestore } from '../firebase/Config'
 import { AppRegistry } from 'react-native';
 import App from '../App';
-AppRegistry.registerComponent('MyApp', () => App);
 import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
 import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+AppRegistry.registerComponent('MyApp', () => App);
 
 
 export default function TaskList( { listId, listName }) {

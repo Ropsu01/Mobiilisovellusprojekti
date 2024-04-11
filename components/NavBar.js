@@ -1,22 +1,28 @@
-import React from 'react';
-import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import React from 'react'
+import { View, Text, StyleSheet, Button } from 'react-native'
 import Home from '../screens/Home';
 import Tasks from '../screens/Tasks';
 import TaskListScreen from '../screens/TaskListScreen';
 import Calendar from '../screens/Calendar';
 import Weather from '../screens/Weather';
 import Jokes from '../screens/Jokes';
-import IconOcticons from 'react-native-vector-icons/Octicons';
-import IconFontisto from 'react-native-vector-icons/Fontisto';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { NavigationContainer } from '@react-navigation/native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import IconOcticons from 'react-native-vector-icons/Octicons'; // Import Octicons
+import IconFontisto from 'react-native-vector-icons/Fontisto'; // Import Fontisto
+import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'; // Import MaterialCommunityIcons
+import * as NavigationBar from 'expo-navigation-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { createStackNavigator } from '@react-navigation/stack';
+
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
 
 function TabNavigator() {
-
 
   return (
     <Tab.Navigator
