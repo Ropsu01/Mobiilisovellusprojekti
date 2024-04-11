@@ -47,36 +47,46 @@ const renderDailyHeader = () => (
     </View>
 );
 
+const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+  
+  
+
     const renderHourlyItem = ({ item }) => (
         <View style={styles.hourlyForecastItem}>
-            <Text>{new Date(item.dt * 1000).toLocaleTimeString('fi-FI', {weekday: 'long', hour: '2-digit', minute: '2-digit' })}</Text>
+<Text>{capitalizeFirstLetter(new Date(item.dt * 1000).toLocaleTimeString('fi-FI', { weekday: 'long', hour: '2-digit', minute: '2-digit' }))}</Text>
             <Image
                 source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
                 style={{ width: 50, height: 50 }}
             />
-            <Text>{item.weather[0].description}</Text>
-            <Text>{`Lämpötila: ${item.temp}°C`}</Text>
-            <Text>{`Tuntuu kuin: ${item.feels_like}°C`}</Text>
+<Text>{capitalizeFirstLetter(item.weather[0].description)}</Text>
+            <Text>{`Lämpötila: ${Math.round(item.temp)}°C`}</Text>
+<Text>{`Tuntuu kuin: ${Math.round(item.feels_like)}°C`}</Text>
+
         </View>
     );
 
     const renderDailyItem = ({ item }) => {
-    const date = new Date(item.dt * 1000);
-    const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
-    const formattedDate = date.toLocaleDateString('fi-FI', options);
-    return (
-        <View style={styles.dailyForecastItem}>
-            <Text>{formattedDate}</Text>
-            <Image
-                source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
-                style={{ width: 50, height: 50 }}
-            />
-            <Text>{item.weather[0].description}</Text>
-            <Text>{`Lämpötila: ${item.temp.day}°C`}</Text>
-            <Text>{`Tuntuu kuin: ${item.feels_like.day}°C`}</Text>
-        </View>
-    );
-};
+        const date = new Date(item.dt * 1000);
+        const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+        const formattedDate = date.toLocaleDateString('fi-FI', options);
+    
+        return (
+            <View style={styles.dailyForecastItem}>
+                {/* Apply capitalization to the first letter of the sentence */}
+                <Text>{capitalizeFirstLetter(formattedDate)}</Text>
+                <Image
+                    source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
+                    style={{ width: 50, height: 50 }}
+                />
+                <Text>{capitalizeFirstLetter(item.weather[0].description)}</Text>
+                <Text>{`Lämpötila: ${Math.round(item.temp.day)}°C`}</Text>
+                <Text>{`Tuntuu kuin: ${Math.round(item.feels_like.day)}°C`}</Text>
+            </View>
+        );
+    };
+    
 
     return (
         <View style={styles.container}>
@@ -87,9 +97,9 @@ const renderDailyHeader = () => (
                         source={{ uri: `${api.icons}${currentWeather.weather[0].icon}@2x.png` }}
                         style={{ width: 100, height: 100 }}
                     />
-                    <Text>{currentWeather.weather[0].description}</Text>
-                    <Text>{`Lämpötila: ${currentWeather.temp}°C`}</Text>
-                    <Text>{`Tuntuu kuin: ${currentWeather.feels_like}°C`}</Text>
+                    <Text>{capitalizeFirstLetter(currentWeather.weather[0].description)}</Text>
+                    <Text>{`Lämpötila: ${Math.round(currentWeather.temp)}°C`}</Text>
+                    <Text>{`Tuntuu kuin: ${Math.round(currentWeather.feels_like)}°C`}</Text>
                 </View>
             )}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hourlyForecastContainer}>
@@ -104,7 +114,8 @@ const renderDailyHeader = () => (
             </ScrollView>
         </View>
     );
-}
+            }
+    
 
 
 const styles = StyleSheet.create({
