@@ -56,14 +56,14 @@ function TabNavigator() {
             marginBottom: 30, // Adjust for spacing between the icon and text
           },
           tabBarActiveTintColor: '#ADBC9F',
-          tabBarInactiveTintColor: '#FBFADA',
+          tabBarInactiveTintColor: '#FFFEE2',
           tabBarActiveBackgroundColor: '#436850',
           tabBarInactiveBackgroundColor: '#436850',
           headerStyle: {
             backgroundColor: '#436850', // Set your desired background color here
           },
           headerTitleStyle: {
-            color: '#FBFADA' // This sets the header title text color
+            color: '#FFFEE2' // This sets the header title text color
           },
         })}
       >

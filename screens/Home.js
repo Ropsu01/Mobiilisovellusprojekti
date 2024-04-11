@@ -2,6 +2,8 @@ import { View, StyleSheet } from 'react-native'
 import React from 'react'
 import FrontWeather from '../components/WeatherFrontPage'
 import FrontPageWeather from '../components/PositionFront'
+import CalendarWidget from '../components/CalendarWidget';
+
 
 export default function Home() {
   return (
@@ -9,6 +11,9 @@ export default function Home() {
       <View style={styles.HomeWeather}>
       <FrontPageWeather/>
       </View> 
+      <View>
+      <CalendarWidget />
+      </View>
     </View>
   )
 }
