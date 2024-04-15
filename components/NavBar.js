@@ -80,7 +80,7 @@ function TabNavigator() {
       })}
     >
       <Tab.Screen name="Koti" component={Home} options={{ tabBarLabel: 'Koti' }} />
-      <Tab.Screen name="Tehtävät" component={Tasks} options={{ tabBarLabel: 'Tehtävät' }} />
+      <Tab.Screen name="Tehtävät" component={Tasks} options={{ tabBarLabel: 'Tehtävälistat' }} />
       <Tab.Screen name="Kalenteri" component={Calendar} options={{ tabBarLabel: 'Kalenteri' }} />
       <Tab.Screen name="Säätiedot" component={Weather} options={{ tabBarLabel: 'Säätiedot' }} />
       <Tab.Screen name="Viihde" component={Jokes} options={{ tabBarLabel: 'Viihde' }} />
@@ -100,6 +100,7 @@ export default function NavBar() {
           <Stack.Screen
             name="takaisin"
             component={TabNavigator}
+            
           />
           <Stack.Screen
             name="TaskListScreen"

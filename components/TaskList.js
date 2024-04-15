@@ -9,7 +9,7 @@ import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicon
 import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-export default function TaskList( { listId, listName }) {
+export default function TaskList( { listId, listColor}) {
     const [todos, setTodos] = useState([])
     const [todo, setTodo] = useState('')
     const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
@@ -158,13 +158,12 @@ export default function TaskList( { listId, listName }) {
         )
     }
 
-
     return (
-        <GestureHandlerRootView style={styles.container}>
+        <GestureHandlerRootView style={[styles.container, { backgroundColor: listColor }]}>
             <View style={styles.contentContainer}>
                 <View style={styles.inputContainer}>
                     <TextInput style={styles.inputText} placeholder="Lisää tehtävä" onChangeText={text => setTodo(text)} value={todo} onSubmitEditing={addTodo} returnKeyType='done' />
-                    <Button style={styles.addButton} onPress={addTodo} title="Lisää" disabled={todo === ''} color={'#12372A'}></Button>
+                    <Button style={styles.addButton} onPress={addTodo} title="Lisää" disabled={todo === ''} color={'#436850'}></Button>
                 </View>
 
                 {todos.length > 0 && (
