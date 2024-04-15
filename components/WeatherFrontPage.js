@@ -80,6 +80,7 @@ export default function FrontWeather(props) {
     </View>
 );
 }
+
 const styles = StyleSheet.create({
     container: {
 
@@ -128,4 +129,5 @@ const styles = StyleSheet.create({
     weatherIcon: {
         marginTop: 10,
     },
+}
 });
