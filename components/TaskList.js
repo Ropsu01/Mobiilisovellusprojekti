@@ -12,7 +12,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 export default function TaskList( { listId, listName }) {
-
     const [todos, setTodos] = useState([])
     const [todo, setTodo] = useState('')
     const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
