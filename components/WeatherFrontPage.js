@@ -86,9 +86,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
-        marginLeft: 15,
-        marginRight: 15,
-        marginBottom: 10,
+        padding: 10,
+        backgroundColor: 'white',
+        borderRadius: 10,
     },
     leftContainer: {
         flexDirection: 'column',
@@ -129,5 +129,4 @@ const styles = StyleSheet.create({
     weatherIcon: {
         marginTop: 10,
     },
-}
 });
