@@ -6,7 +6,9 @@ import FrontPageWeather from '../components/PositionFront'
 export default function Home() {
   return (
     <View style={styles.container}>
-      <FrontPageWeather />
+      <View style={styles.HomeWeather}>
+      <FrontPageWeather/>
+      </View> 
     </View>
   )
 }
@@ -14,7 +16,13 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'lightgrey',
+  },
+  HomeWeather: {
+    marginTop: 10,
+    backgroundColor: 'white',
+    color: '#ABDCAA',
+    borderRadius: 10,
   },
 });

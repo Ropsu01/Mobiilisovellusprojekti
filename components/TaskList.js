@@ -1,3 +1,4 @@
+
 import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, ScrollView, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDocs, where } from 'firebase/firestore'
@@ -9,16 +10,27 @@ import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicon
 import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-export default function TaskList( { listId, listColor}) {
+
+export default function TaskList( { listId, listName }) {
+
     const [todos, setTodos] = useState([])
     const [todo, setTodo] = useState('')
     const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
     useEffect(() => {
+
         if (!listId) return;
 
         const q = query(collection(firestore, 'todos'), where('listId', '==', listId));
+
+        // Tämä useEffect-hook tarkkailee muutoksia todos-tilassa ja reagoi niihin
+        const lastTodo = todos[todos.length - 1];
+        if (lastTodo && lastTodo.done) {
+            const updatedTodos = todos.filter(todo => todo.id !== lastTodo.id);
+            setTodos([...updatedTodos, lastTodo]);
+        }
+
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const tempTodos = []
@@ -108,6 +120,13 @@ export default function TaskList( { listId, listColor}) {
             const updatedDoneState = !todos.find(todo => todo.id === id).done;
             await updateDoc(ref, { done: updatedDoneState });
 
+        
+            // Poista tehtävä taulukosta
+            const updatedTodos = todos.filter(todo => todo.id !== id);
+            // Lisää tehtävä taulukon loppuun
+            const updatedTodo = { ...todos.find(todo => todo.id === id), done: updatedDoneState };
+            setTodos([...updatedTodos, updatedTodo]);
+
         }
         const deleteItem = async () => {
             Alert.alert(
@@ -144,7 +163,10 @@ export default function TaskList( { listId, listColor}) {
             // >
             <View style={[styles.todoContainer]}>
                 <TouchableOpacity onPress={() => toggleDone(item.id)} style={styles.todo}>
-                    {item.done && <IconIonicons name='checkbox' size={30} color={'#436850'} />}
+
+                    {item.done && <IconIonicons name='checkbox' size={30} color={'#1a8f3f'} />}
+
+
                     {!item.done && <IconIonicons name='square-outline' size={30} color={'#79747E'} />}
                     <Text style={styles.todoText}>{item.text}</Text>
                 </TouchableOpacity>
