@@ -20,11 +20,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 0,
-    backgroundColor: 'lightgrey',
+    backgroundColor: '#F7F7F7',
   },
   container2: {
     flex: 1,
-    backgroundColor: 'lightgrey',
+    backgroundColor: '#F7F7F7',
     color: '#ABDCAA',
     alignItems: 'center',
     justifyContent: 'center',

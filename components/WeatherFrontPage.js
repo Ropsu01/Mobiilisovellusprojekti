@@ -9,14 +9,24 @@ const api = {
 
 export default function FrontWeather(props) {
     const [frontTemp, setFrontTemp] = useState(0);
-    const [feels_like, setFeelsLike] = useState(0); // Declare feels_like state here
+    const [feelsLike, setFeelsLike] = useState(0);
     const [frontDescription, setFrontDescription] = useState('');
     const [frontIcon, setFrontIcon] = useState('');
     const [frontError, setFrontError] = useState(null);
-    const [cityName, setCityName] = useState(''); // Declare cityName state here
+    const [cityName, setCityName] = useState('');
+    const [windSpeed, setWindSpeed] = useState(0);
+    const [humidity, setHumidity] = useState(0);
+    const [currentTime, setCurrentTime] = useState('');
 
     const capitalizeFirstLetter = (str) => {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    };
+
+    const getCurrentTime = () => {
+        const date = new Date();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        return `${hours}:${minutes}`;
     };
 
     useEffect(() => {
@@ -30,12 +40,14 @@ export default function FrontWeather(props) {
             return res.json();
         })
         .then((json) => {
-            console.log(json);
             setFrontTemp(Math.round(json.main.temp)); 
             setFrontDescription(capitalizeFirstLetter(json.weather[0].description)); 
             setFrontIcon(api.icons + json.weather[0].icon + '@2x.png');
             setCityName(json.name); 
             setFeelsLike(Math.round(json.main.feels_like));
+            setWindSpeed(json.wind.speed);
+            setHumidity(json.main.humidity);
+            setCurrentTime(getCurrentTime());
         })
         .catch((error) => {
             setFrontError(error.message); 
@@ -52,51 +64,69 @@ export default function FrontWeather(props) {
             <>
                 <View style={styles.leftContainer}>
                     <Text style={styles.city}>{cityName}</Text> 
+                    <Text style={styles.currentTime}>{currentTime}</Text>
 
-                    {frontIcon && <Image source={{ uri: frontIcon }} style={{ width: 100, height: 100 }} />}
+                    {frontIcon && <Image source={{ uri: frontIcon }} style={{ width: 80, height: 80 }} />}
                     <Text style={styles.desc}>{frontDescription}</Text>
                 </View>
                 <View style={styles.rightContainer}>
-                    <Text style={styles.temp}>Lämpötila: {`${frontTemp}°C`}</Text>
-                    <Text style={styles.temp}>Tuntuu kuin: {`${feels_like}°C`}</Text>
+                    <Text style={styles.temp1}>{`${frontTemp}°C`}</Text>
+                    <Text style={styles.temp}>Tuntuu kuin: {`${feelsLike}°C`}</Text>
+                    <Text style={styles.temp}>Tuuli: {`${windSpeed} m/s`}</Text>
+                    <Text style={styles.temp}>Ilmankosteus: {`${humidity}%`}</Text>
                 </View>
             </>
         )}
     </View>
 );
 }
+
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row', // Set the main container's direction to row
-        justifyContent: 'space-between', // Align children with space between them
-        paddingHorizontal: 20, // Add horizontal padding for spacing
-        marginTop: 10, // Add top margin for spacing
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: 'white',
+        borderRadius: 10,
     },
     leftContainer: {
-        flexDirection: 'column', // Set the left container's direction to column
-        alignItems: 'center', // Center children horizontally
+        flexDirection: 'column',
+        alignItems: 'center',
     },
     rightContainer: {
-        flexDirection: 'column', // Set the right container's direction to column
-        marginLeft: 20, // Add left margin for spacing
-        marginTop: 50
+        flexDirection: 'column',
+        marginLeft: 30,
+        marginTop: 0
     },
     city: {
         fontSize: 20,
-        marginBottom: 0,
+        marginBottom: 7,
         textAlign: 'center',
+        fontWeight: 'bold',
     },
     desc: {
-        fontSize: 20,
-        marginBottom: 10,
+        fontSize: 18,
+        marginBottom: 0,
         textAlign: 'center',
     },
     temp: {
-        fontSize: 20,
-        marginBottom: 15,
+        fontSize: 18,
+        marginTop: 5,
+    },
+    temp1: {
+        marginTop: 9,
+        fontSize: 40,
+        marginBottom: 9,
+        fontWeight: 'bold',
+        alignSelf: 'center',
+    },
+    currentTime: {
+        fontSize: 18,
+        marginTop: 0,
+        fontWeight: 'bold',
     },
     weatherIcon: {
-        marginBottom: 0,
-        alignItems: 'center',
+        marginTop: 10,
     },
 });

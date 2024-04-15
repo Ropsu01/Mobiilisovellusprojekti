@@ -90,7 +90,7 @@ const JokesAndFacts = () => {
 
       {/* Päivän fakta */}
       <View style={styles.card}>
-        <Text style={styles.title}>Hauska Fakta:</Text>
+        <Text style={styles.title}>Päivän Fakta:</Text>
         <Text style={styles.content}>{funFact.fact}</Text>
         <MaterialIcons
           name={favorites.includes(funFact.fact) ? "star" : "star-border"}
