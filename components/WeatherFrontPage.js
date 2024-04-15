@@ -17,7 +17,6 @@ export default function FrontWeather(props) {
     const [windSpeed, setWindSpeed] = useState(0);
     const [humidity, setHumidity] = useState(0);
     const [currentTime, setCurrentTime] = useState('');
-    
 
     const capitalizeFirstLetter = (str) => {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -29,7 +28,6 @@ export default function FrontWeather(props) {
         const minutes = date.getMinutes();
         return `${hours}:${minutes}`;
     };
-
 
     useEffect(() => {
         const url = `${api.url}lat=${props.latitude}&lon=${props.longitude}&units=metric&appid=${api.key}&lang=fi`;
@@ -50,9 +48,6 @@ export default function FrontWeather(props) {
             setWindSpeed(json.wind.speed);
             setHumidity(json.main.humidity);
             setCurrentTime(getCurrentTime());
-            setWindSpeed(json.wind.speed);
-            setHumidity(json.main.humidity);
-            setCurrentTime(getCurrentTime());
         })
         .catch((error) => {
             setFrontError(error.message); 
@@ -70,9 +65,7 @@ export default function FrontWeather(props) {
                 <View style={styles.leftContainer}>
                     <Text style={styles.city}>{cityName}</Text> 
                     <Text style={styles.currentTime}>{currentTime}</Text>
-                    <Text style={styles.currentTime}>{currentTime}</Text>
 
-                    {frontIcon && <Image source={{ uri: frontIcon }} style={{ width: 80, height: 80 }} />}
                     {frontIcon && <Image source={{ uri: frontIcon }} style={{ width: 80, height: 80 }} />}
                     <Text style={styles.desc}>{frontDescription}</Text>
                 </View>
@@ -81,52 +74,38 @@ export default function FrontWeather(props) {
                     <Text style={styles.temp}>Tuntuu kuin: {`${feelsLike}°C`}</Text>
                     <Text style={styles.temp}>Tuuli: {`${windSpeed} m/s`}</Text>
                     <Text style={styles.temp}>Ilmankosteus: {`${humidity}%`}</Text>
-                    
                 </View>
             </>
         )}
     </View>
 );
 }
+
 const styles = StyleSheet.create({
     container: {
+
         flexDirection: 'row', // Set the main container's direction to row
         justifyContent: 'space-between', // Align children with space between them
         padding: 20, // Add horizontal padding for spacing
         marginTop: 10, // Add top margin for spacing
         backgroundColor: '#fff', // Set the background color to white
         borderRadius: 10, // Round the corners of the container
-
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 10,
-        marginLeft: 15,
-        marginRight: 15,
-        marginBottom: 10,
-
-    },
     leftContainer: {
         flexDirection: 'column',
         alignItems: 'center',
-        
     },
     rightContainer: {
         flexDirection: 'column',
         marginLeft: 30,
         marginTop: 0
-        
     },
     city: {
         fontSize: 20,
         marginBottom: 7,
-        marginBottom: 7,
         textAlign: 'center',
-        fontWeight: 'bold',
         fontWeight: 'bold',
     },
     desc: {
-        fontSize: 18,
-        marginBottom: 0,
         fontSize: 18,
         marginBottom: 0,
         textAlign: 'center',
@@ -146,22 +125,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginTop: 0,
         fontWeight: 'bold',
-        fontSize: 18,
-        marginTop: 5,
-    },
-    temp1: {
-        marginTop: 9,
-        fontSize: 40,
-        marginBottom: 9,
-        fontWeight: 'bold',
-        alignSelf: 'center',
-    },
-    currentTime: {
-        fontSize: 18,
-        marginTop: 0,
-        fontWeight: 'bold',
     },
     weatherIcon: {
         marginTop: 10,
     },
+}
 });
