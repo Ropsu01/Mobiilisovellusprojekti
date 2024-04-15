@@ -82,13 +82,13 @@ export default function FrontWeather(props) {
 }
 const styles = StyleSheet.create({
     container: {
+
         flexDirection: 'row', // Set the main container's direction to row
         justifyContent: 'space-between', // Align children with space between them
         padding: 20, // Add horizontal padding for spacing
         marginTop: 10, // Add top margin for spacing
         backgroundColor: '#fff', // Set the background color to white
         borderRadius: 10, // Round the corners of the container
-    },
     leftContainer: {
         flexDirection: 'column',
         alignItems: 'center',
