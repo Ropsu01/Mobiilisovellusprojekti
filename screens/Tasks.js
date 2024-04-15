@@ -6,10 +6,9 @@ import { addDoc, collection, onSnapshot, doc, getDoc, query, where, getDocs, del
 import { firestore } from '../firebase/Config'; // Tuodaan Firestore-yhteys
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
-import { set } from 'firebase/database';
 import { Alert } from 'react-native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
-import { ColorPicker} from 'react-native-color-picker';
+
 
 
 export default function Tasks() {
@@ -46,12 +45,6 @@ export default function Tasks() {
             return;
         }
 
-        // if (!selectedColor) {
-        //     // Varmista, että väri on valittu
-        //     console.error('Väriä ei ole valittu.');
-        //     return;
-        // }
-
         try {
             // Lisää uusi lista Firestoreen
             const newListRef = await addDoc(collection(firestore, 'lists'), {
@@ -61,7 +54,6 @@ export default function Tasks() {
             });
             console.log('Uusi lista lisätty Firestoreen:', newListRef.id);
             setNewListName(''); // Tyhjennä uuden listan nimi input-kenttä
-            //setSelectedColor('');
             closeNewListModal(); // Sulje modaalinen 
             setLists([...lists, { id: newListRef.id, name: newListName }]); // Päivitä listatila
         } catch (error) {
