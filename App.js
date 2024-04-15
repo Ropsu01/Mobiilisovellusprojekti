@@ -1,18 +1,16 @@
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { ActivityIndicator } from 'react-native';
-import { useFonts, Lato_400Regular, Lato_700Bold } from '@expo-google-fonts/lato';
-import NavBar from './components/NavBar'; // Assuming NavBar includes the NavigationContainer
+import Weather from './screens/Weather';
+import NavBar from './components/NavBar';
+import { ThemeProvider } from './contexts/ThemeContext'; // Adjust this path according to where you've placed your context
+
 
 export default function App() {
-  let [fontsLoaded] = useFonts({
-    Lato_400Regular,
-    Lato_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return <ActivityIndicator size="large" />;
-  }
-
-  // Directly return NavBar without wrapping it in another NavigationContainer
-  return <NavBar />;
+  return (
+    <ThemeProvider>
+      <View style={{ flex: 1 }}>
+      <NavBar />
+      </View>
+      </ThemeProvider >
+  );
 }

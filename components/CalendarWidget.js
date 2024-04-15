@@ -62,11 +62,6 @@ const styles = StyleSheet.create({
       alignItems: 'flex-start',
       backgroundColor: '#fff', // Optional: Set the background color of the entire row if needed
       borderRadius: 10, // Optional: Round the corners of the entire row
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 2,
-      elevation: 3,
       padding: 10, // Optional: Add padding around the entire row
     },
     dateBox: {

@@ -11,14 +11,24 @@ import IconOcticons from 'react-native-vector-icons/Octicons';
 import IconFontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemeToggleSwitch } from './ToggleButton'; // Adjust the path as necessary
+import { useTheme } from '../contexts/ThemeContext'; // Ensure this is the correct path to your ThemeContext
+
+
 
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
+
+  const { theme } = useTheme(); // Using the theme context
+  const isDarkMode = theme === 'dark';
+
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
+          headerRight: () => <ThemeToggleSwitch />,
+
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
             let IconComponent = IconOcticons; // Default icon component
@@ -47,23 +57,23 @@ function TabNavigator() {
             );
           },
           tabBarStyle: {
-            backgroundColor: '#436850', // Navbar color
-            paddingBottom: 0, // You may need to adjust this for proper alignment
-            height: 80, // Adjust as needed for label text
+            backgroundColor: isDarkMode ? '#333' : '#436850', // Dynamic background color based on theme
+            paddingBottom: 0,
+            height: 80,
           },
           tabBarLabelStyle: {
-            fontSize: 10, // Adjust the size of the label text as needed
-            marginBottom: 30, // Adjust for spacing between the icon and text
+            fontSize: 10,
+            marginBottom: 30,
           },
-          tabBarActiveTintColor: '#ADBC9F',
-          tabBarInactiveTintColor: '#FFFEE2',
-          tabBarActiveBackgroundColor: '#436850',
-          tabBarInactiveBackgroundColor: '#436850',
+          tabBarActiveTintColor:  'green', // Dynamic active tint color
+          tabBarInactiveTintColor: 'grey', // Dynamic inactive tint color
+          tabBarActiveBackgroundColor: isDarkMode ? 'black' : 'white',
+          tabBarInactiveBackgroundColor: isDarkMode ? 'black' : 'white',
           headerStyle: {
-            backgroundColor: '#436850', // Set your desired background color here
+            backgroundColor: isDarkMode ? '#222' : '#FFFFFF', // Dynamic header background color
           },
           headerTitleStyle: {
-            color: '#FFFEE2' // This sets the header title text color
+            color: isDarkMode ? 'white' : 'black', // Dynamic header title color
           },
         })}
       >
