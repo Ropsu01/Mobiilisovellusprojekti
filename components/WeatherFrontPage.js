@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext'; // Adjust the path if necessary
+
 
 const api = {
     url: process.env.EXPO_PUBLIC_API_URL2,
@@ -8,6 +10,9 @@ const api = {
 };
 
 export default function FrontWeather(props) {
+    const { theme } = useTheme(); // Use the theme context
+    const isDarkMode = theme === 'dark';
+
     const [frontTemp, setFrontTemp] = useState(0);
     const [feelsLike, setFeelsLike] = useState(0);
     const [frontDescription, setFrontDescription] = useState('');
@@ -26,68 +31,78 @@ export default function FrontWeather(props) {
         const date = new Date();
         const hours = date.getHours();
         const minutes = date.getMinutes();
-        return `${hours}:${minutes}`;
+        return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`; // Fixed minutes formatting
     };
 
     useEffect(() => {
         const url = `${api.url}lat=${props.latitude}&lon=${props.longitude}&units=metric&appid=${api.key}&lang=fi`;
 
         fetch(url)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error('Weather data not available');
-            }
-            return res.json();
-        })
-        .then((json) => {
-            setFrontTemp(Math.round(json.main.temp)); 
-            setFrontDescription(capitalizeFirstLetter(json.weather[0].description)); 
-            setFrontIcon(api.icons + json.weather[0].icon + '@2x.png');
-            setCityName(json.name); 
-            setFeelsLike(Math.round(json.main.feels_like));
-            setWindSpeed(json.wind.speed);
-            setHumidity(json.main.humidity);
-            setCurrentTime(getCurrentTime());
-        })
-        .catch((error) => {
-            setFrontError(error.message); 
-            console.error(error);
-        });
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Weather data not available');
+                }
+                return res.json();
+            })
+            .then((json) => {
+                setFrontTemp(Math.round(json.main.temp)); 
+                setFrontDescription(capitalizeFirstLetter(json.weather[0].description)); 
+                setFrontIcon(api.icons + json.weather[0].icon + '@2x.png');
+                setCityName(json.name); 
+                setFeelsLike(Math.round(json.main.feels_like));
+                setWindSpeed(json.wind.speed);
+                setHumidity(json.main.humidity);
+                setCurrentTime(getCurrentTime());
+            })
+            .catch((error) => {
+                setFrontError(error.message); 
+                console.error(error);
+            });
 
     }, [props.latitude, props.longitude]); 
 
-    return (
-    <View style={styles.container}>
-        {frontError ? (
-            <Text>{frontError}</Text>
-        ) : (
-            <>
-                <View style={styles.leftContainer}>
-                    <Text style={styles.city}>{cityName}</Text> 
-                    <Text style={styles.currentTime}>{currentTime}</Text>
+    // Dynamic styles based on theme
+    const containerStyle = {
+        ...styles.container,
+        backgroundColor: isDarkMode ? 'black' : 'white'
+    };
+    const textStyle = {
+        color: isDarkMode ? 'white' : 'black'
+    };
 
-                    {frontIcon && <Image source={{ uri: frontIcon }} style={{ width: 80, height: 80 }} />}
-                    <Text style={styles.desc}>{frontDescription}</Text>
-                </View>
-                <View style={styles.rightContainer}>
-                    <Text style={styles.temp1}>{`${frontTemp}°C`}</Text>
-                    <Text style={styles.temp}>Tuntuu kuin: {`${feelsLike}°C`}</Text>
-                    <Text style={styles.temp}>Tuuli: {`${windSpeed} m/s`}</Text>
-                    <Text style={styles.temp}>Ilmankosteus: {`${humidity}%`}</Text>
-                </View>
-            </>
-        )}
-    </View>
-);
+    return (
+        <View style={containerStyle}>
+            {frontError ? (
+                <Text style={textStyle}>{frontError}</Text>
+            ) : (
+                <>
+                    <View style={styles.leftContainer}>
+                        <Text style={[styles.city, textStyle]}>{cityName}</Text>
+                        <Text style={[styles.currentTime, textStyle]}>{currentTime}</Text>
+
+                        {frontIcon && <Image source={{ uri: frontIcon }} style={{ width: 80, height: 80 }} />}
+                        <Text style={[styles.desc, textStyle]}>{frontDescription}</Text>
+                    </View>
+                    <View style={styles.rightContainer}>
+                        <Text style={[styles.temp1, textStyle]}>{`${frontTemp}°C`}</Text>
+                        <Text style={[styles.temp, textStyle]}>Tuntuu kuin: {`${feelsLike}°C`}</Text>
+                        <Text style={[styles.temp, textStyle]}>Tuuli: {`${windSpeed} m/s`}</Text>
+                        <Text style={[styles.temp, textStyle]}>Ilmankosteus: {`${humidity}%`}</Text>
+                    </View>
+                </>
+            )}
+        </View>
+    );
 }
 
+// Adjust your existing styles here
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
         padding: 10,
-        backgroundColor: 'white',
+        paddingHorizontal: 25,
         borderRadius: 10,
     },
     leftContainer: {
@@ -97,7 +112,6 @@ const styles = StyleSheet.create({
     rightContainer: {
         flexDirection: 'column',
         marginLeft: 30,
-        marginTop: 0
     },
     city: {
         fontSize: 20,
@@ -107,7 +121,6 @@ const styles = StyleSheet.create({
     },
     desc: {
         fontSize: 18,
-        marginBottom: 0,
         textAlign: 'center',
     },
     temp: {
@@ -120,13 +133,15 @@ const styles = StyleSheet.create({
         marginBottom: 9,
         fontWeight: 'bold',
         alignSelf: 'center',
+        color: 'green', // Setting the color to green
+
     },
     currentTime: {
         fontSize: 18,
-        marginTop: 0,
         fontWeight: 'bold',
     },
     weatherIcon: {
         marginTop: 10,
     },
 });
+
