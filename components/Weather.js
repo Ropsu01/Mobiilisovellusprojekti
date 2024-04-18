@@ -49,7 +49,7 @@ export default function Weather(props) {
                     description: capitalizeFirstLetter(json.current.weather[0].description),
                     iconUrl: `${api.icons}${json.current.weather[0].icon}@2x.png`,
                 });
-                setForecast(json.daily.slice(1, 7)); // Adjust slicing as needed
+                setForecast(json.daily.slice(1, 11)); // Adjust slicing as needed
                 setHourlyForecast(json.hourly.slice(0, 24));
             })
             .catch(error => {
@@ -57,22 +57,23 @@ export default function Weather(props) {
                 setError(error.message);
             });
     }, [props.latitude, props.longitude]);
-    
+
 
     const styles = getDynamicStyles(isDarkMode);
 
 
     const renderHourlyHeader = () => (
-        <View style={styles.forecastHeaderTextContainer}>
-            <Text style={styles.forecastHeaderText}>Tunnittaiset Säätiedot</Text>
+        <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>24h Ennuste</Text>
         </View>
     );
 
     const renderDailyHeader = () => (
-        <View style={styles.forecastHeaderTextContainer}>
-            <Text style={styles.forecastHeaderText}>Päivittäiset Säätiedot</Text>
+        <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>Viikon Ennuste</Text>
         </View>
     );
+
 
     const capitalizeFirstLetter = (str) => {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -85,33 +86,33 @@ export default function Weather(props) {
             <Text style={styles.text}>{capitalizeFirstLetter(new Date(item.dt * 1000).toLocaleTimeString('fi-FI', { weekday: 'long', hour: '2-digit', minute: '2-digit' }))}</Text>
             <Image
                 source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
-                style={{ width: 50, height: 50 }}
+                style={{ width: 60, height: 60 }}
             />
+                        <Text style={styles.text}>{`${Math.round(item.temp)}°C`}</Text> 
             <Text style={styles.text}>{capitalizeFirstLetter(item.weather[0].description)}</Text>
-            <Text style={styles.text}>{`Lämpötila: ${Math.round(item.temp)}°C`}</Text>
-            <Text style={styles.text}>{`Tuntuu kuin: ${Math.round(item.feels_like)}°C`}</Text>
-
         </View>
     );
+    
+    
 
     const renderDailyItem = ({ item }) => {
         const date = new Date(item.dt * 1000);
         const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
         const formattedDate = date.toLocaleDateString('fi-FI', options);
-
+    
         return (
             <View style={styles.dailyForecastItem}>
                 <Text style={styles.text}>{capitalizeFirstLetter(formattedDate)}</Text>
                 <Image
                     source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
-                    style={{ width: 50, height: 50 }}
+                    style={{ width: 60, height: 60 }}
                 />
-                <Text style={styles.text}>{capitalizeFirstLetter(item.weather[0].description)}</Text>
-                <Text style={styles.text}>{`Lämpötila: ${Math.round(item.temp.day)}°C`}</Text>
-                <Text style={styles.text}>{`Tuntuu kuin: ${Math.round(item.feels_like.day)}°C`}</Text>
+                                <Text style={styles.text}>{`${Math.round(item.temp.day)}°C`}</Text> 
+                <Text style={styles.text}>{capitalizeFirstLetter(item.weather[0].description)}</Text> 
             </View>
         );
     };
+    
 
 
     return (
@@ -119,12 +120,12 @@ export default function Weather(props) {
             {currentWeather && (
                 <View style={styles.currentWeatherContainer}>
                     <View style={styles.leftWeatherContainer}>
-                    <Text style={[styles.cityName, { textAlign: 'center' }]}>{cityName}</Text>  
+                        <Text style={[styles.cityName, { textAlign: 'center' }]}>{cityName}</Text>
                         <Image
                             source={{ uri: currentWeather.iconUrl }}
                             style={styles.weatherIcon}
                         />
-                                                <Text style={[styles.smallInfoText, { textAlign: 'center' }]}>{currentWeather.description}</Text>
+                        <Text style={[styles.smallInfoText, { textAlign: 'center' }]}>{currentWeather.description}</Text>
 
                     </View>
                     <View style={styles.rightWeatherContainer}>
@@ -135,22 +136,34 @@ export default function Weather(props) {
                     </View>
                 </View>
             )}
-      
-    
-    
 
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hourlyForecastContainer}>
-                {hourlyForecast.map((item) => renderHourlyItem({ item, key: item.dt }))}
-            </ScrollView>
 
-            <FlatList
-                data={forecast}
-                renderItem={renderDailyItem}
-                keyExtractor={(item) => item.dt.toString()}
-                contentContainerStyle={styles.dailyForecastContainer}
 
-            />
+
+            <View style={styles.hourlySectionContainer}>
+                {renderHourlyHeader()}
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.hourlyForecastContainer}
+                    bounces={false}
+                >
+                    {hourlyForecast.map((item) => renderHourlyItem({ item, key: item.dt }))}
+                </ScrollView>
+            </View>
+
+
+
+            <View style={styles.dailyForecastContainer}>
+                {renderDailyHeader()}
+                <FlatList
+                    data={forecast}
+                    renderItem={renderDailyItem}
+                    keyExtractor={(item) => item.dt.toString()}
+                    style={styles.flatListStyle} // Optional: Apply any necessary styles to the FlatList
+                />
+            </View>
         </View>
     );
 }
@@ -162,14 +175,22 @@ function getDynamicStyles(isDarkMode) {
         container: {
             width: 360,
         },
+        headerContainer: {
+            height: 35, // Set a fixed height for header
+            backgroundColor: isDarkMode ? '#353535' : '#E5E5E5', // Darker background for header
+            justifyContent: 'center', // Vertically center content inside header
+            alignContent: 'center', // Horizontally center content inside header
+            paddingLeft: 10, // Add padding to the left
+            borderTopLeftRadius: 10, // Rounded corners
+            borderTopRightRadius: 10,
+        },
         currentWeatherContainer: {
             flexDirection: 'row',
             justifyContent: 'space-between',
             marginTop: 10,
             padding: 10,
-            paddingHorizontal: 25,
             borderRadius: 10,
-            backgroundColor: isDarkMode ? '#000' : '#fff', // Ensure visibility
+            backgroundColor: isDarkMode ? '#1C1C1C' : '#F7F7F7', // Ensure visibility
             marginBottom: 10,
         },
         leftWeatherContainer: {
@@ -197,23 +218,29 @@ function getDynamicStyles(isDarkMode) {
 
         },
         weatherIcon: {
-            width: 80,
-            height: 80,
-            margin: 10,
+            width: 100,
+            height: 100,
+        },
+        hourlySectionContainer: {
+            backgroundColor: isDarkMode ? '#000' : '#FFF', // Background color
+            borderRadius: 10, // Apply rounded corners here
+            overflow: 'hidden', // Ensure internal items don't overlap the corners
+            marginBottom: 10,
         },
         
+
         hourlyForecastContainer: {
-            height: 150, // Set minimum height to ensure scrollability
+            height: 140, // Set minimum height to ensure scrollability
             backgroundColor: isDarkMode ? '#000' : '#FFF',
             borderRadius: 10,
             minWidth: 360,
-            marginBottom: 10,
         },
         dailyForecastContainer: {
-            maxHeight: 300, // Limit the height of the daily forecast container
+            maxHeight: 290, // Set maximum height to ensure scrollability
             backgroundColor: isDarkMode ? '#000' : '#FFF',
             borderRadius: 10,
         },
+
         hourlyForecastItem: {
             alignItems: 'center', // Center items horizontally
             borderRadius: 10,
@@ -222,17 +249,15 @@ function getDynamicStyles(isDarkMode) {
         },
         dailyForecastItem: {
             alignItems: 'center', // Center items horizontally
-            borderBottomWidth: 1, // Add a border at the bottom of each daily forecast item
             paddingVertical: 10, // Vertical padding to separate items
             paddingHorizontal: 5, // Horizontal padding to separate items
         },
-        headertext: {
-            fontSize: 18,
-            marginTop: 10,
-            color: isDarkMode ? '#FFF' : '#000',
-            fontWeight: 'bold',
+        headerText: {
+            fontSize: 16,
+            color: isDarkMode ? '#fff' : '#000', // Text color based on theme
         },
         text: {
+            fontSize: 16,
             color: isDarkMode ? '#FFF' : '#000',  // White text in dark mode, black text in light mode
         },
         cityName: {
@@ -241,6 +266,6 @@ function getDynamicStyles(isDarkMode) {
             color: isDarkMode ? '#FFF' : '#000', // Ensure visibility
             textAlign: 'center', // Ensure alignment is visible
         },
-        
+
     });
 }
