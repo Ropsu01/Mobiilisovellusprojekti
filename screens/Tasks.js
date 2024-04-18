@@ -2,22 +2,27 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import TaskListScreen from '../screens/TaskListScreen';
 import { View, Text, Button, StyleSheet, TextInput, Modal, FlatList } from 'react-native';
-import { addDoc, collection, onSnapshot, doc, getDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore'; // Tuodaan Firestore-tietokannan toiminnot
+import { addDoc, collection, onSnapshot, doc, getDoc, query, where, getDocs, deleteDoc, setDoc } from 'firebase/firestore'; // Tuodaan Firestore-tietokannan toiminnot
 import { firestore } from '../firebase/Config'; // Tuodaan Firestore-yhteys
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
-import { set } from 'firebase/database';
 import { Alert } from 'react-native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
+
 
 export default function Tasks() {
     const [isNewListModalVisible, setIsNewListModalVisible] = useState(false);
     const [newListName, setNewListName] = useState('');
     const [lists, setLists] = useState([]);
     const navigation = useNavigation();
-    const [selectedListId, setSelectedListId] = useState(null); // Uusi tila valitulle listalle
+    const [selectedList, setSelectedList] = useState(null);
+    const [selectedLists, setSelectedLists] = useState([]);
+
 
     useEffect(() => {
+        navigation.setOptions({
+            title: 'Tehtävälistat', // Aseta yläpalkin otsikoksi "Tehtävälistat"
+        });
         const unsubscribe = onSnapshot(collection(firestore, 'lists'), (snapshot) => {
             const listsData = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
             setLists(listsData);
@@ -45,6 +50,7 @@ export default function Tasks() {
             // Lisää uusi lista Firestoreen
             const newListRef = await addDoc(collection(firestore, 'lists'), {
                 name: newListName,
+
                 // Lisää muita tarvittavia kenttiä tarvittaessa
             });
             console.log('Uusi lista lisätty Firestoreen:', newListRef.id);
@@ -122,6 +128,10 @@ export default function Tasks() {
                             console.log('List deleted:', listId);
                             // Päivitä listatila poistamalla poistettu lista
                             setLists(lists.filter(list => list.id !== listId));
+                            // Poista valittu lista, jos se poistettiin
+                            if (selectedList && selectedList.id === listId) {
+                                setSelectedList(null);
+                            }
                         } catch (error) {
                             console.error('Error deleting list:', error);
                         }
@@ -132,16 +142,79 @@ export default function Tasks() {
         );
     };
 
+
+
+    const toggleListSelection = async (listId) => {
+        let updatedSelectedLists = [];
+    
+        if (selectedLists.includes(listId)) {
+            // Jos valittu lista on jo valittujen listojen joukossa, poista se
+            updatedSelectedLists = [];
+            // Poista listan valinta etusivulla
+            await updateListForHomePage(listId, false);
+        } else {
+            // Jos valittu lista ei ole vielä valittujen listojen joukossa, lisää se
+            updatedSelectedLists = [listId];
+            // Merkitse lista valituksi etusivulla
+            await updateListForHomePage(listId, true);
+        }
+    
+        setSelectedLists(updatedSelectedLists);
+    
+        try {
+            // Tallenna päivitetty valittujen listojen tila Firestoreen
+            await updateSelectedListsInFirestore(updatedSelectedLists);
+        } catch (error) {
+            console.error('Error updating selected lists in Firestore:', error);
+        }
+    };
+    
+    const updateSelectedListsInFirestore = async (updatedSelectedLists) => {
+        try {
+            // Päivitä valittujen listojen tiedot Firestoreen
+            await setDoc(doc(firestore, 'users', 'currentUserUid'), {
+                selectedLists: updatedSelectedLists
+            }, { merge: true });
+            console.log('Selected lists updated in Firestore:', updatedSelectedLists);
+        } catch (error) {
+            throw new Error('Error updating selected lists in Firestore:', error);
+        }
+    };
+
+
+    const updateListForHomePage = async (listId, selected) => {
+        try {
+            // Päivitä kenttä, joka osoittaa, onko lista valittu etusivulla vai ei
+            await setDoc(doc(firestore, 'lists', listId), {
+                isOnHomePage: selected
+            }, { merge: true });
+            console.log(`List ${listId} updated for home page: ${selected}`);
+        } catch (error) {
+            console.error('Error updating list for home page:', error);
+        }
+    };
+
     return (
         <View style={styles.container}>
-            {/*<Text style={[styles.tasks,  { fontWeight: 'normal', textAlign: 'center', fontSize: 24 }]}>Minun listani</Text>*/}
+            <View>
+                <Text>Etusivulla näkyvä lista: {selectedList ? selectedList.name : 'Ei valittu'}</Text>
+            </View>
             <View style={[styles.listContainer, { maxHeight: lists.length > 8 ? 570 : null }]}>
                 <FlatList
                     data={lists}
                     renderItem={({ item }) => (
                         <View style={styles.listContainer}>
                             <TouchableOpacity onPress={() => handleListPress(item.id)}>
-                                <Text style={styles.listItem}>{item.name}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <TouchableOpacity onPress={() => toggleListSelection(item.id)} style={{ marginRight: 10 }}>
+                                        {selectedLists.includes(item.id) ? (
+                                            <IconIonicons name='home' size={25} color='#436850' />
+                                        ) : (
+                                            <IconIonicons name='home-outline' size={25} color='#79747E' />
+                                        )}
+                                    </TouchableOpacity>
+                                    <Text style={styles.listItem}>{item.name}</Text>
+                                </View>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => deleteList(item.id, item.name)}>
                                 <IconIonicons name='trash-outline' size={25} color='#79747E' />
@@ -159,7 +232,7 @@ export default function Tasks() {
 
             <Modal
                 visible={isNewListModalVisible}
-                animationType='slide'
+                animationType='fade'
                 transparent={true}
                 onRequestClose={closeNewListModal}
             >

@@ -1,19 +1,17 @@
 
-import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, ScrollView, Modal } from 'react-native'
+import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDocs, where } from 'firebase/firestore'
 import { firestore } from '../firebase/Config'
 import { AppRegistry } from 'react-native';
 import App from '../App';
+AppRegistry.registerComponent('MyApp', () => App);
 import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
 import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-AppRegistry.registerComponent('MyApp', () => App);
-
 
 export default function TaskList( { listId, listName }) {
-
     const [todos, setTodos] = useState([])
     const [todo, setTodo] = useState('')
     const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
@@ -181,13 +179,12 @@ export default function TaskList( { listId, listName }) {
         )
     }
 
-
     return (
         <GestureHandlerRootView style={styles.container}>
             <View style={styles.contentContainer}>
                 <View style={styles.inputContainer}>
                     <TextInput style={styles.inputText} placeholder="Lisää tehtävä" onChangeText={text => setTodo(text)} value={todo} onSubmitEditing={addTodo} returnKeyType='done' />
-                    <Button style={styles.addButton} onPress={addTodo} title="Lisää" disabled={todo === ''} color={'#12372A'}></Button>
+                    <Button style={styles.addButton} onPress={addTodo} title="Lisää" disabled={todo === ''} color={'#436850'}></Button>
                 </View>
 
                 {todos.length > 0 && (
