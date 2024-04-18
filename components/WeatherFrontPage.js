@@ -80,15 +80,14 @@ export default function FrontWeather(props) {
     </View>
 );
 }
-
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
-        padding: 10,
-        backgroundColor: 'white',
-        borderRadius: 10,
+        marginLeft: 15,
+        marginRight: 15,
+        marginBottom: 10,
     },
     leftContainer: {
         flexDirection: 'column',

@@ -59,17 +59,23 @@ function TabNavigator() {
           backgroundColor: isDarkMode ? '#333' : '#436850', // Dynamic background color based on theme
           paddingBottom: 0,
           height: 80,
+          borderTopWidth: 0, // Remove the top border line
+          shadowOpacity: 0, // Remove shadow for iOS
+          elevation: 0, // Remove shadow for Android
         },
         tabBarLabelStyle: {
           fontSize: 10,
           marginBottom: 30,
         },
-        tabBarActiveTintColor:  'green', // Dynamic active tint color
+        tabBarActiveTintColor:  '#00AF00', // Dynamic active tint color
         tabBarInactiveTintColor: 'grey', // Dynamic inactive tint color
         tabBarActiveBackgroundColor: isDarkMode ? 'black' : 'white',
         tabBarInactiveBackgroundColor: isDarkMode ? 'black' : 'white',
         headerStyle: {
-          backgroundColor: isDarkMode ? '#222' : '#FFFFFF', // Dynamic header background color
+          backgroundColor: isDarkMode ? 'black' : '#FFFFFF', // Dynamic header background color
+          borderTopWidth: 0, // Remove the top border line
+          shadowOpacity: 0, // Remove shadow for iOS
+          elevation: 0, // Remove shadow for Android
         },
         headerTitleStyle: {
           color: isDarkMode ? 'white' : 'black', // Dynamic header title color

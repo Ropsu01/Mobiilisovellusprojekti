@@ -1,10 +1,11 @@
 
-import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, ScrollView, Modal } from 'react-native'
+import { View, Text, Button, StyleSheet, TextInput, FlatList, Touchable, TouchableOpacity, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDocs, where } from 'firebase/firestore'
 import { firestore } from '../firebase/Config'
 import { AppRegistry } from 'react-native';
 import App from '../App';
+AppRegistry.registerComponent('MyApp', () => App);
 import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
 import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -179,7 +180,7 @@ export default function TaskList( { listId, listName }) {
     }
 
     return (
-        <GestureHandlerRootView style={[styles.container, { backgroundColor: listColor }]}>
+        <GestureHandlerRootView style={styles.container}>
             <View style={styles.contentContainer}>
                 <View style={styles.inputContainer}>
                     <TextInput style={styles.inputText} placeholder="Lisää tehtävä" onChangeText={text => setTodo(text)} value={todo} onSubmitEditing={addTodo} returnKeyType='done' />

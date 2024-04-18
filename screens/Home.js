@@ -1,15 +1,18 @@
 import { View, StyleSheet } from 'react-native'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import FrontWeather from '../components/WeatherFrontPage'
 import FrontPageWeather from '../components/PositionFront'
 import CalendarWidget from '../components/CalendarWidget';
+import TasksFrontPage from '../components/TasksFrontPage';
 
 export default function Home() {
+
   return (
     <View style={styles.container}>
       <View style={styles.widgetContainer}>
         <FrontPageWeather/>
         <CalendarWidget/>
+        <TasksFrontPage/>
       </View>
     </View>
   )
