@@ -83,7 +83,7 @@ const JokesAndFacts = () => {
         <MaterialIcons
           name={favorites.includes(joke.joke) ? "star" : "star-border"}
           size={24}
-          color={favorites.includes(joke.joke) ? "gold" : "gold"}
+          color={favorites.includes(joke.joke) ? "green" : "green"}
           onPress={() => toggleFavorite(joke.joke)}
         />
       </View>
