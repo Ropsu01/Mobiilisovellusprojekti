@@ -2,12 +2,13 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import TaskListScreen from '../screens/TaskListScreen';
 import { View, Text, Button, StyleSheet, TextInput, Modal, FlatList } from 'react-native';
-import { addDoc, collection, onSnapshot, doc, getDoc, query, where, getDocs, deleteDoc, setDoc } from 'firebase/firestore'; // Tuodaan Firestore-tietokannan toiminnot
+import { addDoc, collection, onSnapshot, doc, getDoc, query, where, getDocs, deleteDoc, setDoc, runTransaction } from 'firebase/firestore'; // Tuodaan Firestore-tietokannan toiminnot
 import { firestore } from '../firebase/Config'; // Tuodaan Firestore-yhteys
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { Alert } from 'react-native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
+
 
 
 export default function Tasks() {
@@ -16,21 +17,19 @@ export default function Tasks() {
     const [lists, setLists] = useState([]);
     const navigation = useNavigation();
     const [selectedList, setSelectedList] = useState(null);
-    const [selectedLists, setSelectedLists] = useState([]);
 
 
     useEffect(() => {
-        navigation.setOptions({
-            title: 'Tehtävälistat', // Aseta yläpalkin otsikoksi "Tehtävälistat"
-        });
+        navigation.setOptions({ title: 'Tehtävälistat' });
         const unsubscribe = onSnapshot(collection(firestore, 'lists'), (snapshot) => {
-            const listsData = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
+            const listsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setLists(listsData);
+            const selected = listsData.find(list => list.isOnHomePage);
+            setSelectedList(selected || null);
         });
-        return () => {
-            unsubscribe();
-        };
+        return () => unsubscribe();
     }, []);
+
 
     const openNewListModal = () => {
         setIsNewListModalVisible(true);
@@ -144,31 +143,39 @@ export default function Tasks() {
 
 
 
-    const toggleListSelection = async (listId) => {
-        let updatedSelectedLists = [];
-    
-        if (selectedLists.includes(listId)) {
-            // Jos valittu lista on jo valittujen listojen joukossa, poista se
-            updatedSelectedLists = [];
-            // Poista listan valinta etusivulla
-            await updateListForHomePage(listId, false);
-        } else {
-            // Jos valittu lista ei ole vielä valittujen listojen joukossa, lisää se
-            updatedSelectedLists = [listId];
-            // Merkitse lista valituksi etusivulla
-            await updateListForHomePage(listId, true);
-        }
-    
-        setSelectedLists(updatedSelectedLists);
-    
+    const toggleListSelection = async (selectedListId) => {
+        console.log(`Attempting to toggle visibility for list ID: ${selectedListId}`);
         try {
-            // Tallenna päivitetty valittujen listojen tila Firestoreen
-            await updateSelectedListsInFirestore(updatedSelectedLists);
+            await runTransaction(firestore, async (transaction) => {
+                const listsSnapshot = await getDocs(collection(firestore, 'lists'));
+                listsSnapshot.docs.forEach(doc => {
+                    // Set isOnHomePage to true only for the selected list and false for others
+                    const isOnHomePage = doc.id === selectedListId;
+                    transaction.update(doc.ref, { isOnHomePage });
+                });
+            });
+    
+            console.log("Transaction successfully committed!");
+            fetchLists(); // Refresh lists to reflect changes
         } catch (error) {
-            console.error('Error updating selected lists in Firestore:', error);
+            console.error('Transaction failed: ', error);
         }
     };
     
+
+
+    const fetchLists = async () => {
+        const snapshot = await getDocs(collection(firestore, 'lists'));
+        const fetchedLists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setLists(fetchedLists);
+        const selected = fetchedLists.find(list => list.isOnHomePage);
+        setSelectedList(selected || null);
+    };
+
+
+
+
+
     const updateSelectedListsInFirestore = async (updatedSelectedLists) => {
         try {
             // Päivitä valittujen listojen tiedot Firestoreen
@@ -207,12 +214,13 @@ export default function Tasks() {
                             <TouchableOpacity onPress={() => handleListPress(item.id)}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <TouchableOpacity onPress={() => toggleListSelection(item.id)} style={{ marginRight: 10 }}>
-                                        {selectedLists.includes(item.id) ? (
+                                        {item.isOnHomePage ? (
                                             <IconIonicons name='home' size={25} color='#436850' />
                                         ) : (
                                             <IconIonicons name='home-outline' size={25} color='#79747E' />
                                         )}
                                     </TouchableOpacity>
+
                                     <Text style={styles.listItem}>{item.name}</Text>
                                 </View>
                             </TouchableOpacity>
