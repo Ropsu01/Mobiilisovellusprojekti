@@ -15,11 +15,13 @@ export default function Home() {
     { backgroundColor: isDarkMode ? '#1C1C1C' : '#F7F7F7' } // Conditional background color
   ];
 
+
   return (
     <View style={containerStyles}>
       <View style={styles.widgetContainer}>
         <FrontPageWeather/>
         <CalendarWidget/>
+        <TasksFrontPage/>
       </View>
     </View>
   );
