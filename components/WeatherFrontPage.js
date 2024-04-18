@@ -94,7 +94,9 @@ export default function FrontWeather(props) {
         </View>
     );
 }
-// Adjust your existing styles here
+
+
+
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
@@ -103,6 +105,9 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingHorizontal: 25,
         borderRadius: 10,
+
+
+
     },
     leftContainer: {
         flexDirection: 'column',
@@ -142,4 +147,9 @@ const styles = StyleSheet.create({
     weatherIcon: {
         marginTop: 10,
     },
+
 });
+
+
+
+
