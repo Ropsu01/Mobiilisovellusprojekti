@@ -28,8 +28,12 @@ function TabNavigator() {
 
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerRight: () => <ThemeToggleSwitch />,
+    screenOptions={({ route }) => ({
+      headerRight: () => (
+        <View style={{ marginRight: 10 }}>  
+          <ThemeToggleSwitch />
+        </View>
+      ),
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           let IconComponent = IconOcticons; // Default icon component
