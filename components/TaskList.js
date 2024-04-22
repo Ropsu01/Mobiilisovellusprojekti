@@ -317,7 +317,7 @@ function getDynamicStyles(isDarkMode) {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
         },
         modalContent: {
-            backgroundColor: '#ffffff',
+            backgroundColor: isDarkMode ? '#000' : '#FFF',
             width: '80%',
             padding: 20,
             borderRadius: 10,
@@ -335,6 +335,7 @@ function getDynamicStyles(isDarkMode) {
             borderColor: '#cccccc',
             borderRadius: 5,
             paddingHorizontal: 10,
+            color: isDarkMode ? '#FFF' : '#000',
         },
         deleteAll: {
             position: 'absolute',

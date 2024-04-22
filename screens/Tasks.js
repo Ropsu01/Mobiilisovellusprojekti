@@ -8,6 +8,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { Alert } from 'react-native';
 import IconIonicons from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../contexts/ThemeContext'; // Import the theme context
+
 
 
 
@@ -17,6 +19,11 @@ export default function Tasks() {
     const [lists, setLists] = useState([]);
     const navigation = useNavigation();
     const [selectedList, setSelectedList] = useState(null);
+    const { theme } = useTheme(); // Retrieve the current theme
+    const isDarkMode = theme === 'dark'; // Determine if the theme is dark
+
+    const styles = getDynamicStyles(isDarkMode);
+
    
 
     useEffect(() => {
@@ -266,10 +273,12 @@ export default function Tasks() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
+function getDynamicStyles(isDarkMode) {
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: isDarkMode ? '#1C1C1C' : '#F7F7F7' 
+        },
     addButtonContainer: {
         position: 'absolute',
         right: 30,
@@ -290,10 +299,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',},
     modalContent: {
-        backgroundColor: '#ffffff',
+        backgroundColor: isDarkMode ? '#000' : '#F7F7F7',
         width: '80%',
         padding: 20,
         borderRadius: 10,
@@ -303,6 +311,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: isDarkMode ? '#FFF' : '#000'
     },
     inputText: {
         height: 40,
@@ -311,6 +320,7 @@ const styles = StyleSheet.create({
         borderColor: '#cccccc',
         borderRadius: 5,
         paddingHorizontal: 10,
+        color: isDarkMode ? '#FFF' : '#000'
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -320,11 +330,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '',
         margin: 20,
+        color: isDarkMode ? '#FFF' : '#000'
     },
     listItem: {
         fontSize: 18,
         marginVertical: 10,
         paddingHorizontal: 20,
+        color: isDarkMode ? '#FFF' : '#000'
     },
     listContainer: {
         flexDirection: 'row',
@@ -367,3 +379,4 @@ const styles = StyleSheet.create({
         margin: 10,
     }
 });
+}

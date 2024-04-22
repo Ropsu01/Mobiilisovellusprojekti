@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { firestore } from '../firebase/Config';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, onSnapshot } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { fi } from 'date-fns/locale';
 import { useTheme } from '../contexts/ThemeContext';
@@ -13,25 +13,28 @@ const CalendarWidget = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchEvents = () => {
       const todayStr = format(today, 'yyyy-MM-dd');
       const q = query(
         collection(firestore, 'events'),
         where('date', '>=', todayStr),
         orderBy('date', 'asc')
       );
-
-      const querySnapshot = await getDocs(q);
-      const events = [];
-      querySnapshot.forEach((doc) => {
-        events.push(doc.data());
+  
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const events = [];
+        querySnapshot.forEach((doc) => {
+          events.push({ ...doc.data(), id: doc.id, time: doc.data().time });
+        });
+        setUpcomingEvents(events);
       });
-
-      setUpcomingEvents(events);
+  
+      return unsubscribe; // Unsubscribe from the listener when the component unmounts
     };
-
-    fetchEvents();
+  
+    return fetchEvents();
   }, [today]);
+  
 
   return (
     <View style={styles.container}>
@@ -40,7 +43,7 @@ const CalendarWidget = () => {
           backgroundColor: isDarkMode ? '#000' : '#FFF',
           shadowColor: isDarkMode ? '#FFF' : '#000',  // Consider using a more contrasting color in dark mode
         }]}>
-          <Text style={{ color: isDarkMode ? 'white' : 'black', fontSize: 24 }}>
+          <Text style={{ color: isDarkMode ? 'white' : 'black', fontSize: 20 }}>
             {format(today, 'EEEE', { locale: fi })}
           </Text>
           <Text style={{ color: isDarkMode ? 'white' : 'black', fontSize: 48, fontWeight: 'bold' }}>
@@ -89,6 +92,7 @@ const styles = StyleSheet.create({
     padding: 15,
     shadowOffset: { width: 0, height: 1 },
     elevation: 3,
+    
   },
   day: {
     fontSize: 48,
