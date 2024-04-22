@@ -83,13 +83,18 @@ export default function Weather(props) {
 
     const renderHourlyItem = ({ item }) => (
         <View style={styles.hourlyForecastItem}>
-            <Text style={styles.text}>{capitalizeFirstLetter(new Date(item.dt * 1000).toLocaleTimeString('fi-FI', { weekday: 'long', hour: '2-digit', minute: '2-digit' }))}</Text>
+            <Text style={styles.text}>
+                {new Date(item.dt * 1000).toLocaleTimeString('fi-FI', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false  // Use 24-hour format if needed
+                })}
+            </Text>
             <Image
                 source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
-                style={{ width: 60, height: 60 }}
+                style={{ width: 80, height: 80 }}
             />
-                        <Text style={styles.text}>{`${Math.round(item.temp)}°C`}</Text> 
-            <Text style={styles.text}>{capitalizeFirstLetter(item.weather[0].description)}</Text>
+            <Text style={styles.text}>{`${Math.round(item.temp)}°C`}</Text>
         </View>
     );
     
@@ -105,7 +110,7 @@ export default function Weather(props) {
                 <Text style={styles.text}>{capitalizeFirstLetter(formattedDate)}</Text>
                 <Image
                     source={{ uri: `${api.icons}${item.weather[0].icon}@2x.png` }}
-                    style={{ width: 60, height: 60 }}
+                    style={{ width: 80, height: 80 }}
                 />
                                 <Text style={styles.text}>{`${Math.round(item.temp.day)}°C`}</Text> 
                 <Text style={styles.text}>{capitalizeFirstLetter(item.weather[0].description)}</Text> 
@@ -147,7 +152,6 @@ export default function Weather(props) {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.hourlyForecastContainer}
-                    bounces={false}
                 >
                     {hourlyForecast.map((item) => renderHourlyItem({ item, key: item.dt }))}
                 </ScrollView>
@@ -239,6 +243,7 @@ function getDynamicStyles(isDarkMode) {
             maxHeight: 290, // Set maximum height to ensure scrollability
             backgroundColor: isDarkMode ? '#000' : '#FFF',
             borderRadius: 10,
+            
         },
 
         hourlyForecastItem: {
@@ -250,7 +255,8 @@ function getDynamicStyles(isDarkMode) {
         dailyForecastItem: {
             alignItems: 'center', // Center items horizontally
             paddingVertical: 10, // Vertical padding to separate items
-            paddingHorizontal: 5, // Horizontal padding to separate items
+            borderBottomWidth: 1, // Add a border at the bottom of each daily forecast item
+            borderBottomColor: isDarkMode ? '#4A4A4A' : '#E5E5E5', // Ensure visibility
         },
         headerText: {
             fontSize: 16,
