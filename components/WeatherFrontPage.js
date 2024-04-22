@@ -80,7 +80,7 @@ export default function FrontWeather(props) {
                         <Text style={[styles.city, textStyle]}>{cityName}</Text>
                         <Text style={[styles.currentTime, textStyle]}>{currentTime}</Text>
 
-                        {frontIcon && <Image source={{ uri: frontIcon }} style={{ width: 80, height: 80 }} />}
+                        {frontIcon && <Image source={{ uri: frontIcon }} style={styles.weatherIcon} />}
                         <Text style={[styles.desc, textStyle]}>{frontDescription}</Text>
                     </View>
                     <View style={styles.rightContainer}>
@@ -141,7 +141,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     weatherIcon: {
-        marginTop: 10,
+        marginTop: -20,
+        marginBottom: -20,
+        width: 130,
+        height: 130,
     },
 
 });

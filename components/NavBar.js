@@ -92,12 +92,15 @@ function TabNavigator() {
 }
 
 export default function NavBar() {
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#436850' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDarkMode ? '#333' : '#fff' }}>
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
-            headerShown: false, // This hides headers for all screens in this navigator
+            headerShown: false, // Globally hides headers for all screens in this navigator
           }}
         >
           <Stack.Screen
@@ -111,12 +114,15 @@ export default function NavBar() {
               headerShown: true,
               title: route.params?.title ?? '',
               headerStyle: {
-                backgroundColor: '#436850',
+                backgroundColor: isDarkMode ? '#000' : '#fff',
+                borderTopWidth: 0, // Remove the top border line
+          shadowOpacity: 0, // Remove shadow for iOS
+          elevation: 0, // Remove shadow for Android
               },
               headerTitleStyle: {
-                color: '#FBFADA',
+                color: isDarkMode ? 'white' : 'black',
               },
-              headerTintColor: '#FBFADA', // This sets the back button color
+              headerTintColor: isDarkMode ? 'white' : 'black', // This sets the back button color
             })}
           />
         </Stack.Navigator>

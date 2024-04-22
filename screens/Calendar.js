@@ -40,8 +40,8 @@ const NoteContainer = ({ note, onOpen, isDarkMode }) => {
       style={[
         styles.noteContainer,
         {
-          backgroundColor: isDarkMode ? '#000' : '#FFF',
-          borderColor: isDarkMode ? '#BFBFBF' : '#000',
+          backgroundColor: isDarkMode ? '#555' : '#FFF',
+          borderColor: isDarkMode ? '#555' : '#000',
         }
       ]}
     >
@@ -49,7 +49,7 @@ const NoteContainer = ({ note, onOpen, isDarkMode }) => {
         styles.noteText,
         { color: isDarkMode ? '#FFF' : '#000' }
       ]}>
-        <Text style={{ color: isDarkMode ? '#00AF00' : '#00AF00' }}>{note.time}  </Text>
+        <Text style={{ color: isDarkMode ? '#00E000' : '#00AF00' }}>{note.time}  </Text>
         <Text>{note.text}</Text>
       </Text>
     </TouchableOpacity>
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'green', // Medium Green for add button
+    backgroundColor: '#00AF00', // Medium Green for add button
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,

@@ -9,13 +9,17 @@ AppRegistry.registerComponent('MyApp', () => App);
 import IconIonicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
 import { Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useTheme } from '../contexts/ThemeContext'; // Adjust the path if necessary
 
 
-export default function TaskList( { listId, listName }) {
+
+export default function TaskList({ listId, listName }) {
     const [todos, setTodos] = useState([])
     const [todo, setTodo] = useState('')
     const [editedTodo, setEditedTodo] = useState({ id: '', text: '' });
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const { theme } = useTheme();
+    const isDarkMode = theme === 'dark';
 
     useEffect(() => {
 
@@ -90,7 +94,7 @@ export default function TaskList( { listId, listName }) {
             Alert.alert('Tyhjä tehtävä', 'Tehtävä ei voi olla tyhjä');
             return;
         }
-        const doc = await addDoc(collection(firestore, 'todos'), { text: todo, done: false, listId: listId});
+        const doc = await addDoc(collection(firestore, 'todos'), { text: todo, done: false, listId: listId });
         setTodo('')
     }
 
@@ -119,7 +123,7 @@ export default function TaskList( { listId, listName }) {
             const updatedDoneState = !todos.find(todo => todo.id === id).done;
             await updateDoc(ref, { done: updatedDoneState });
 
-        
+
             // Poista tehtävä taulukosta
             const updatedTodos = todos.filter(todo => todo.id !== id);
             // Lisää tehtävä taulukon loppuun
@@ -163,28 +167,40 @@ export default function TaskList( { listId, listName }) {
             <View style={[styles.todoContainer]}>
                 <TouchableOpacity onPress={() => toggleDone(item.id)} style={styles.todo}>
 
-                    {item.done && <IconIonicons name='checkbox' size={30} color={'#1a8f3f'} />}
+                    {item.done && <IconIonicons name='checkbox' size={30} color={'#00AF00'} />}
 
 
-                    {!item.done && <IconIonicons name='square-outline' size={30} color={'#79747E'} />}
+                    {!item.done && <IconIonicons name='square-outline' size={30} color={'#A09AA6'} />}
                     <Text style={styles.todoText}>{item.text}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 25 }} onPress={() => openEditModal(item.id, item.text)}>
-                    <IconIonicons name='pencil' size={25} color='#79747E' />
+                    <IconIonicons name='pencil' size={25} color='#A09AA6' />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={deleteItem}>
-                    <IconIonicons name='trash-outline' size={25} color='#79747E' />
+                    <IconIonicons name='trash-outline' size={25} color='#A09AA6' />
                 </TouchableOpacity>
             </View>
         )
     }
 
+    const styles = getDynamicStyles(isDarkMode);
+
     return (
         <GestureHandlerRootView style={styles.container}>
             <View style={styles.contentContainer}>
                 <View style={styles.inputContainer}>
-                    <TextInput style={styles.inputText} placeholder="Lisää tehtävä" onChangeText={text => setTodo(text)} value={todo} onSubmitEditing={addTodo} returnKeyType='done' />
-                    <Button style={styles.addButton} onPress={addTodo} title="Lisää" disabled={todo === ''} color={'#436850'}></Button>
+                    <TextInput
+                        style={styles.inputText}
+                        placeholder="Lisää tehtävä"
+                        onChangeText={text => setTodo(text)}
+                        value={todo}
+                        onSubmitEditing={addTodo}
+                        returnKeyType='done'
+                        placeholderTextColor={isDarkMode ? '#aaa' : '#888'} // Dynamically set placeholder text color
+
+                    />
+                    <Button style={styles.addButton} onPress={addTodo} title="Lisää" disabled={todo === ''} color={'#00AF00'}></Button>
+
                 </View>
 
                 {todos.length > 0 && (
@@ -229,94 +245,101 @@ export default function TaskList( { listId, listName }) {
 }
 
 
-const styles = StyleSheet.create({
-    container: {
-        marginHorizontal: 20,
-    },
-    contentContainer: {
-        marginBottom: 60,
-    },
+function getDynamicStyles(isDarkMode) {
+    return StyleSheet.create({
+        container: {
+            marginHorizontal: 20,
+            backgroundColor: isDarkMode ? '#1C1C1C' : '#F7F7F7'
+        },
+        contentContainer: {
+            marginBottom: 60,
+            
+        },
 
-    inputContainer: {
-        marginVertical: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    inputText: {
-        flex: 1,
-        height: 45,
-        borderWidth: 1,
-        borderRadius: 10,
-        borderColor: '#79747E',
-        padding: 10,
-        backgroundColor: '#fff',
-        marginEnd: 10,
-    },
-    todoContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: 10,
-        marginVertical: 6,
-        borderRadius: 10,
-    },
-    todoText: {
-        flex: 1,
-        paddingHorizontal: 4,
-        marginLeft: 10,
-    },
-    todo: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    checkbox: {
-        width: 27,
-        height: 27,
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 10,
-    },
-    checkmark: {
-        fontSize: 20,
-        color: 'black', // Vaihda tämä haluamaksesi valintamerkin väriksi
-    },
-    addButton: {
-        borderRadius: 10,
-    },
-    scrollContainer: {
-        maxHeight: 510,
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: '#ffffff',
-        width: '80%',
-        padding: 20,
-        borderRadius: 10,
-        elevation: 5,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
+        inputContainer: {
+            marginVertical: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            
+        },
+        inputText: {
+            flex: 1,
+            height: 45,
+            borderWidth: 1,
+            borderRadius: 10,
+            borderColor: isDarkMode ? '#AAA' : '#79747E',
+            padding: 10,
+            backgroundColor: isDarkMode ? '#000' : '#FFF',
+            marginEnd: 10,
+        },
+        todoContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: isDarkMode ? '#555' : '#FFF',
+            padding: 10,
+            marginVertical: 6,
+            borderRadius: 10,
+        },
+        todoText: {
+            flex: 1,
+            paddingHorizontal: 4,
+            marginLeft: 10,
+            color: isDarkMode ? '#FFF' : '#000',
+        },
+        todo: {
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        checkbox: {
+            width: 27,
+            height: 27,
+            borderRadius: 5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 10,
+        },
+        checkmark: {
+            fontSize: 20,
+            color: 'black', // Vaihda tämä haluamaksesi valintamerkin väriksi
+        },
+        addButton: {
+            borderRadius: 10,
+            backgroundColor: '#00AF00',
+        },
+        scrollContainer: {
+            maxHeight: 510,
+        },
+        modalContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        },
+        modalContent: {
+            backgroundColor: '#ffffff',
+            width: '80%',
+            padding: 20,
+            borderRadius: 10,
+            elevation: 5,
+        },
+        buttonContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+        },
 
-    editTextInput: {
-        height: 40,
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: '#cccccc',
-        borderRadius: 5,
-        paddingHorizontal: 10,
-    },
-    deleteAll: {
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
-    },
-})
+        editTextInput: {
+            height: 40,
+            marginBottom: 20,
+            borderWidth: 1,
+            borderColor: '#cccccc',
+            borderRadius: 5,
+            paddingHorizontal: 10,
+        },
+        deleteAll: {
+            position: 'absolute',
+            bottom: 0,
+            width: '100%',
+        },
+    })
+}

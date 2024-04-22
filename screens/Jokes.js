@@ -155,11 +155,14 @@ const styles = StyleSheet.create({
     marginTop: 5,
     width: '100%',
     maxHeight: 200,
+    marginLeft: 42,
+
   },
   favoriteTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    
   },
   favoriteItemContainer: {
     flexDirection: 'row',
@@ -172,6 +175,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     marginRight: 10,
+    
   },
 });
 
