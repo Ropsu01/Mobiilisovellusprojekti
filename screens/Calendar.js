@@ -321,7 +321,7 @@ export default function Calendar() {
         style={styles.addButton}
         onPress={() => setModalVisible(true)}
       >
-        <Icon name="add" size={24} color="#FFF" />
+        <Icon name="add" size={17} color="#FFF" />
       </TouchableOpacity>
 
       <Modal

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import FrontWeather from '../components/WeatherFrontPage';

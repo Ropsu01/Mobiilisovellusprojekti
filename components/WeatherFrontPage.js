@@ -95,6 +95,8 @@ export default function FrontWeather(props) {
     );
 }
 
+
+
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
@@ -103,6 +105,8 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingHorizontal: 25,
         borderRadius: 10,
+
+
 
     },
     leftContainer: {
@@ -148,5 +152,7 @@ const styles = StyleSheet.create({
     },
 
 });
+
+
 
 

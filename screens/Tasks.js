@@ -17,7 +17,7 @@ export default function Tasks() {
     const [lists, setLists] = useState([]);
     const navigation = useNavigation();
     const [selectedList, setSelectedList] = useState(null);
-
+   
 
     useEffect(() => {
         navigation.setOptions({ title: 'Tehtävälistat' });
@@ -154,14 +154,15 @@ export default function Tasks() {
                     transaction.update(doc.ref, { isOnHomePage });
                 });
             });
-    
+
             console.log("Transaction successfully committed!");
             fetchLists(); // Refresh lists to reflect changes
+            Alert.alert('Listan lisääminen etusivulle', `Lista" ${selectedList.name}" lisätty etusivulle.`);
         } catch (error) {
             console.error('Transaction failed: ', error);
         }
     };
-    
+
 
 
     const fetchLists = async () => {
@@ -203,9 +204,7 @@ export default function Tasks() {
 
     return (
         <View style={styles.container}>
-            <View>
-                <Text>Etusivulla näkyvä lista: {selectedList ? selectedList.name : 'Ei valittu'}</Text>
-            </View>
+
             <View style={[styles.listContainer, { maxHeight: lists.length > 8 ? 570 : null }]}>
                 <FlatList
                     data={lists}
@@ -215,7 +214,7 @@ export default function Tasks() {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <TouchableOpacity onPress={() => toggleListSelection(item.id)} style={{ marginRight: 10 }}>
                                         {item.isOnHomePage ? (
-                                            <IconIonicons name='home' size={25} color='#436850' />
+                                            <IconIonicons name='home' size={25} color='#00AF00' />
                                         ) : (
                                             <IconIonicons name='home-outline' size={25} color='#79747E' />
                                         )}
@@ -228,14 +227,17 @@ export default function Tasks() {
                                 <IconIonicons name='trash-outline' size={25} color='#79747E' />
                             </TouchableOpacity>
                         </View>
+
                     )}
                     keyExtractor={(item) => item.id}
                     scrollEnabled={lists.length > 8} // Lisätty scrollEnabled ominaisuus
                 />
+
             </View>
 
+
             <View style={styles.addButtonContainer}>
-                <Button color={'white'} title="+" onPress={openNewListModal} />
+                <Button color={'#FFF'} title="+" onPress={openNewListModal} />
             </View>
 
             <Modal
@@ -270,15 +272,20 @@ const styles = StyleSheet.create({
     },
     addButtonContainer: {
         position: 'absolute',
+        right: 30,
         bottom: 30,
-        right: 35,
-        backgroundColor: '#436850',
-        borderRadius: 50,
-        width: 55,
-        height: 55,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#00AF00', // Medium Green for add button
         justifyContent: 'center',
         alignItems: 'center',
-    },
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+      },
     modalContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -355,4 +362,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    ListAboveText: {
+        fontSize: 20,
+        margin: 10,
+    }
 });
