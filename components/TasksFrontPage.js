@@ -45,7 +45,7 @@ export default function TasksWidget({ listId }) {
       <View style={styles.todoContainer}>
         <TouchableOpacity onPress={() => toggleDone(item.id, item.done)} style={styles.todo}>
           {item.done ? (
-            <IconIonicons name='checkbox' size={30} color={'#1a8f3f'} />
+            <IconIonicons name='checkbox' size={30} color={'#00AF00'} />
           ) : (
             <IconIonicons name='square-outline' size={30} color={'#79747E'} />
           )}

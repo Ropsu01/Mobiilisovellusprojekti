@@ -321,7 +321,7 @@ export default function Calendar() {
         style={styles.addButton}
         onPress={() => setModalVisible(true)}
       >
-        <Icon name="add" size={24} color="#FFF" />
+        <Icon name="add" size={17} color="#FFF" />
       </TouchableOpacity>
 
       <Modal
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'green', // Medium Green for add button
+    backgroundColor: '#00AF00', // Medium Green for add button
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,
