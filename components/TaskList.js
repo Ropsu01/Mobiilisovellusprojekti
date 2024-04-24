@@ -70,12 +70,13 @@ export default function TaskList({ listId, listName }) {
                     text: 'Tyhjennä',
                     onPress: async () => {
                         try {
-                            // Poista kaikki tehtävät tietokannasta
                             const todoCollectionRef = collection(firestore, 'todos');
-                            const querySnapshot = await getDocs(todoCollectionRef);
+                            const q = query(todoCollectionRef, where('listId', '==', listId)); // Only select todos from the current list
+                            const querySnapshot = await getDocs(q);
                             querySnapshot.forEach(async (doc) => {
                                 await deleteDoc(doc.ref);
                             });
+    
 
                             // Tyhjennä tehtävät tilasta
                             setTodos([]);
@@ -271,6 +272,7 @@ function getDynamicStyles(isDarkMode) {
             padding: 10,
             backgroundColor: isDarkMode ? '#000' : '#FFF',
             marginEnd: 10,
+            color: isDarkMode ? '#FFF' : '#000',
         },
         todoContainer: {
             flexDirection: 'row',
