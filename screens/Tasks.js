@@ -157,7 +157,7 @@ export default function Tasks() {
 
             console.log("Transaction successfully committed!");
             fetchLists(); // Refresh lists to reflect changes
-            Alert.alert('Listan lisääminen etusivulle', `Lista" ${selectedList.name}" lisätty etusivulle.`);
+            Alert.alert('Listan lisääminen etusivulle', `Lista" ${lists.find(list => list.id === selectedListId)?.name}" lisätty etusivulle.`);
         } catch (error) {
             console.error('Transaction failed: ', error);
         }
